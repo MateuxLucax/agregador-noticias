@@ -23,8 +23,8 @@ public class Contagem
 	}
 
 	public int    getCasos()       { return casos; }
-	public int    getRecuperados() { return casos; }
-	public int    getMortos()      { return casos; }
+	public int    getRecuperados() { return recuperados; }
+	public int    getMortos()      { return mortos; }
 	public Regiao getRegiao()      { return regiao; }
 	public Date getDataColeta()    { return dataColeta; }
 }
