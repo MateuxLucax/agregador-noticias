@@ -22,28 +22,28 @@ public class Noticia {
   public String getResumo() { return resumo; }
 
   public boolean setTitulo(String titulo) {
-		if (titulo.isBlank()) return false;
-		this.titulo = titulo;
-		return true;
+    if (titulo.isBlank()) return false;
+    this.titulo = titulo;
+    return true;
   }
 
   public boolean setData(Date data) {
     if (data != this.data) return false;
     this.data = data;
-		return true;
+    return true;
   }
 
 
   public boolean setUrl(String url) {
-		// TODO usar regex pra detectar se é URL válida
-		if (url.isBlank()) return false; 
+    // TODO usar regex pra detectar se é URL válida
+    if (url.isBlank()) return false; 
     this.url = url;
-		return true;
+    return true;
   }
 
 
-  public void setResumo(String resumo) {
-		if (resumo.isBlank()) return false;  
+  public boolean setResumo(String resumo) {
+    if (resumo.isBlank()) return false;  
     this.resumo = resumo;
     return true;
   }

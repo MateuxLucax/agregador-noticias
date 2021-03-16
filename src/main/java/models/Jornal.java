@@ -6,7 +6,7 @@ public class Jornal {
 
   private final String             nome;
   private final String             url;
-	private final Parser             parser;
+  private final Parser             parser;
   private       ArrayList<Noticia> noticias;
 
   public Jornal(String nome, String url, Parser parser) {
@@ -22,20 +22,20 @@ public class Jornal {
   public ArrayList<Noticia> getNoticias() { return noticias; }
 
   public boolean setNome(String nome) {
-		if (nome.isBlank()) return false; 
+    if (nome.isBlank()) return false; 
     this.nome = nome;
-		return true;
+    return true;
   }
 
   public boolean setUrl(String url) {
-		if (url.isBlank()) return false; 
+    if (url.isBlank()) return false; 
     this.url = url;
-		return true;
+    return true;
   }
 
   public boolean addNoticia(Noticia noticia) {
     if (!noticias.contains(noticia)) return false;
-    noticias.add(noticias);
+    noticias.add(noticia);
     return true;
   }
 

@@ -5,17 +5,26 @@ public class Application {
 
 
 /*
-class DadosUsuario {
-	private ArrayList<Jornal> jornaisSeguidos;
+public class Jornal {
+    ...
 
-	public ArrayList<Noticia> getNoticiasRecentes() {
-		ArrayList<Noticia> noticiasRecentes;
-		for (Jornal j : jornaisSeguidos) {
-			Parser p = j.getParser(); // parserG1, parserCNN, etc.
-			for (Noticia n : p.getNoticiasRecentes())
-				noticiasRecentes.add(n);
-		}
-		return noticiasRecentes;
-	}
+    public void preencherNoticias(<args>) {
+        this.noticias = parser.getNoticias(<args>);
+    }
+    // cada método sobrecarregado getNoticias em Parser
+    // tem um método correspondente preencherNoticias que chama esse getNoticias 
 }
+
+public class Application {
+    private DadosUsuario ds;
+    ...
+    public static void main(String[] args) {
+        for (Jornal j : ds.jornaisSeguidos()) {
+            j.preencherNoticias();
+        }
+
+        // mostrar notícias na interface etc.
+    }
+}
+
 */

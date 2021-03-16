@@ -38,7 +38,8 @@ public class DadosUsuario
     this.jornaisSeguidos.remove(jornal);
   }
 
-	public void remover(Noticia noticia) {
-	}
+  public void remover(Noticia noticia) {
+    this.noticiasLerMaisTarde.remove(noticia);
+  }
 
 }
