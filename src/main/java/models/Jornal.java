@@ -12,26 +12,14 @@ public class Jornal {
   public Jornal(String nome, String url, Parser parser) {
       this.nome = nome;
       this.url = url;
-			this.parser = parser;
-			noticias = new ArrayList<>();
+      this.parser = parser;
+      noticias = new ArrayList<>();
   }
 
   public String             getNome()     { return nome; }
   public String             getUrl()      { return url; }
   public Parser             getParser()   { return parser; }
   public ArrayList<Noticia> getNoticias() { return noticias; }
-
-  public boolean setNome(String nome) {
-    if (nome.isBlank()) return false; 
-    this.nome = nome;
-    return true;
-  }
-
-  public boolean setUrl(String url) {
-    if (url.isBlank()) return false; 
-    this.url = url;
-    return true;
-  }
 
   public boolean addNoticia(Noticia noticia) {
     if (!noticias.contains(noticia)) return false;
