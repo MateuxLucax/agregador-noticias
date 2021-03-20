@@ -51,7 +51,7 @@ public class Application {
             jornalSeguido[i] = false;
     }
 
-    public static void carregarJornaisSeguidos() throws FileNotFoundException {
+    public static void loadJornaisSeguidos() throws FileNotFoundException {
         Scanner scn = new Scanner(arquivoJornaisSeguidos);
         scn.useDelimiter(";");
 
@@ -71,7 +71,7 @@ public class Application {
         }
     }
 
-    public static void salvarJornaisSeguidos() throws FileNotFoundException {
+    public static void saveJornaisSeguidos() throws FileNotFoundException {
         Formatter fmt = new Formatter(arquivoJornaisSeguidos);
         int n = jornalSeguido.length;
         for (int i=0; i < n-1; i++)
@@ -85,7 +85,7 @@ public class Application {
         initArquivos();
 
         try {
-            carregarJornaisSeguidos();
+            loadJornaisSeguidos();
 
             for (int i = 0; i < jornais.length; i++) {
                 if (jornalSeguido[i]) {
@@ -102,7 +102,7 @@ public class Application {
                 }
             }
 
-            salvarJornaisSeguidos();
+            saveJornaisSeguidos();
         } catch (FileNotFoundException e) {
             System.out.println("Algum(ns) arquivo(s) estão faltando.");
             System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");
