@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class G1Parser extends Parser {
@@ -29,7 +28,7 @@ public class G1Parser extends Parser {
 
     public G1Parser() {
         MAX_PAGES = 10;
-        formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", new Locale("pt","BR"));
         formatter.setTimeZone(TimeZone.getTimeZone("UTC-3"));
         postUrl = this.getPostsUrl();
     }
@@ -46,7 +45,7 @@ public class G1Parser extends Parser {
         AtomicReference<Noticia> noticia = new AtomicReference<>(new Noticia());
         int page = 1;
 
-        while (page < MAX_PAGES) {
+        while (page <= MAX_PAGES) {
             getItems(getDocument(postUrl + page)).forEach(item -> {
                 try {
                     if (isAggregatedPosts(item)) return;
@@ -56,8 +55,8 @@ public class G1Parser extends Parser {
                     if(isSearchedUrl(itemContent, url)) {
                         noticia.set(getNoticiaFromContent(itemContent, formatter.parse(((JsonObject) item).get("modified").getAsString())));
                     }
-                } catch (Exception ignored) {
-                    System.out.println("something went wrong while parsing item: " + item.toString());
+                } catch (Exception e) {
+                    System.out.println("AVISO: " + e.toString());
                 }
             });
             page++;
@@ -69,14 +68,14 @@ public class G1Parser extends Parser {
     public ArrayList<Noticia> getNoticias() {
         ArrayList<Noticia> noticias = new ArrayList<>();
 
-        for (int page = 1; page < MAX_PAGES; page++) {
+        for (int page = 1; page <= MAX_PAGES; page++) {
             getItems(getDocument(postUrl + page)).forEach(item -> {
                 try {
                     if (isAggregatedPosts(item)) return;
 
                     noticias.add(getNoticiaFromContent(getItemContent(item), getPostDate(item)));
-                } catch (Exception ignored) {
-                    System.out.println("something went wrong while parsing item: " + item.toString());
+                } catch (Exception e) {
+                    System.out.println("AVISO: " + e.toString());
                 }
             });
         }
@@ -90,7 +89,7 @@ public class G1Parser extends Parser {
         ArrayList<Noticia> noticias = new ArrayList<>();
         int page = 1;
 
-        while (page < MAX_PAGES) {
+        while (page <= MAX_PAGES) {
             getItems(getDocument(postUrl + page)).forEach(item -> {
                 try {
                     Date date = getPostDate(item);
@@ -100,8 +99,8 @@ public class G1Parser extends Parser {
                     if (isAggregatedPosts(item)) return;
 
                     noticias.add(getNoticiaFromContent(getItemContent(item), date));
-                } catch (Exception ignored) {
-                    System.out.println("something went wrong while parsing item: " + item.toString());
+                } catch (Exception e) {
+                    System.out.println("AVISO: " + e.toString());
                 }
             });
             page++;
@@ -115,7 +114,7 @@ public class G1Parser extends Parser {
         ArrayList<Noticia> noticias = new ArrayList<>();
         int page = 1;
 
-        while (page < MAX_PAGES) {
+        while (page <= MAX_PAGES) {
             getItems(getDocument(postUrl + page)).forEach(item -> {
                 try {
                     Date date = getPostDate(item);
@@ -125,8 +124,8 @@ public class G1Parser extends Parser {
                     if (isAggregatedPosts(item)) return;
 
                     noticias.add(getNoticiaFromContent(getItemContent(item), date));
-                } catch (Exception ignored) {
-                    System.out.println("something went wrong while parsing item: " + item.toString());
+                } catch (Exception e) {
+                    System.out.println("AVISO: " + e.toString());
                 }
             });
             page++;
@@ -139,16 +138,14 @@ public class G1Parser extends Parser {
     public ArrayList<Noticia> getNoticiasRecentes() {
         Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
         ArrayList<Noticia> noticias = new ArrayList<>();
-        AtomicBoolean shouldContinue = new AtomicBoolean(true);
         int page = 1;
 
-        while (page < MAX_PAGES || shouldContinue.get()) {
+        while (page <= MAX_PAGES) {
             getItems(getDocument(postUrl + page)).forEach(item -> {
                 try {
                     Date date = getPostDate(item);
 
                     if (date.before(Date.from(yesterday))) {
-                        shouldContinue.set(false);
                         return;
                     }
 
@@ -216,7 +213,7 @@ public class G1Parser extends Parser {
             return noticia;
         }
 
-        throw new Exception("something went wrong while getting news from: " + content.toString());
+        throw new Exception("Algo deu errado ao tentar coletar uma notícia do G1.");
     }
 
     private boolean isSearchedUrl(JsonObject content, String search) {

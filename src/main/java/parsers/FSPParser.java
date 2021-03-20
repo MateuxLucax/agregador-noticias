@@ -19,7 +19,7 @@ public class FSPParser extends Parser {
 
 
     public FSPParser() {
-        formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+        formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("pt","BR"));
         formatter.setTimeZone(TimeZone.getTimeZone("UTC-3"));
     }
 
@@ -35,8 +35,8 @@ public class FSPParser extends Parser {
                     noticia = getNoticiaFromContent(headlineContent, getNewsDate(headlineContent));
                     break;
                 }
-            } catch (Exception ignored) {
-                System.out.println("something went wrong while parsing news: " + news.toString());
+            } catch (Exception e) {
+                System.out.println("AVISO: " + e.toString());
             }
         }
 
@@ -52,8 +52,8 @@ public class FSPParser extends Parser {
                 Element headlineContent = getHeadlineContent(news);
 
                 noticias.add(getNoticiaFromContent(headlineContent, getNewsDate(headlineContent)));
-            } catch (Exception ignored) {
-                System.out.println("something went wrong while parsing news: " + news.toString());
+            } catch (Exception e) {
+                System.out.println("AVISO: " + e.toString());
             }
         });
 
@@ -75,8 +75,8 @@ public class FSPParser extends Parser {
                     noticias.add(getNoticiaFromContent(headlineContent, date));
 
                 }
-            } catch (Exception ignored) {
-                System.out.println("something went wrong while parsing news: " + news.toString());
+            } catch (Exception e) {
+                System.out.println("AVISO: " + e.toString());
             }
         };
 
@@ -96,8 +96,8 @@ public class FSPParser extends Parser {
                 if (!date.before(dataInicial) || !date.after(dataFinal)) {
                     noticias.add(getNoticiaFromContent(headlineContent, date));
                 }
-            } catch (Exception ignored) {
-                System.out.println("something went wrong while parsing news: " + news.toString());
+            } catch (Exception e) {
+                System.out.println("AVISO: " + e.toString());
             }
         };
 
@@ -121,7 +121,7 @@ public class FSPParser extends Parser {
 
                 }
             } catch (Exception ignored) {
-                System.out.println("something went wrong while parsing news: " + news.toString());
+                System.out.println("AVISO: " + news.toString());
             }
         };
 
@@ -151,7 +151,7 @@ public class FSPParser extends Parser {
             return noticia;
         }
 
-        throw new Exception("something went wrong while getting news from: " + headlineContent.toString());
+        throw new Exception("algo deu errado ao tentar coletar uma notícia do G1.");
     }
 
     private Date getNewsDate(Element headlineContent) throws ParseException {

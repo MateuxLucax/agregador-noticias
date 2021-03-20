@@ -1,5 +1,6 @@
 import models.Jornal;
 import models.Noticia;
+import parsers.BBCParser;
 import parsers.FSPParser;
 import parsers.G1Parser;
 import parsers.Parser;
@@ -17,7 +18,8 @@ public class Application {
 
     public static Jornal[] jornais = {
         new Jornal("G1", "https://g1.globo.com/", new G1Parser()),
-        new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/", new FSPParser())
+        new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/", new FSPParser()),
+        new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser())
     };
 
     // se jornalSeguido[i] então mostramos as notícias de jornais[i]
@@ -87,11 +89,11 @@ public class Application {
                     Parser p = jornais[i].getParser();
 
                     Instant now = Instant.now();
-                    Instant yesterday = now.minus(1, ChronoUnit.DAYS);
-                    Instant today = now.truncatedTo(ChronoUnit.DAYS);
+                    Date yesterday = Date.from(now.minus(1, ChronoUnit.DAYS));
+                    Date today = Date.from(now.truncatedTo(ChronoUnit.DAYS));
 
                     System.out.println(jornais[i].getNome());
-                    ArrayList<Noticia> ns = p.getNoticias(Date.from(yesterday), Date.from(today));
+                    ArrayList<Noticia> ns = p.getNoticias(yesterday, today);
                     for (Noticia n : ns)
                         System.out.println(n);
                 }

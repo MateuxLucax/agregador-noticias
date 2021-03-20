@@ -13,7 +13,7 @@ public abstract class Parser {
 
   public abstract ArrayList<Noticia> getNoticias();
 
-  public abstract ArrayList<Noticia> getNoticias(Date data);
+  public abstract ArrayList<Noticia> getNoticias(Date dataPesquisa);
 
   public abstract ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal);
 
