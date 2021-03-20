@@ -1,6 +1,9 @@
 package models;
 
+import parsers.Parser;
+
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Jornal {
 

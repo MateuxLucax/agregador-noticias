@@ -24,7 +24,7 @@ public class DadosUsuario
 
   public boolean addJornal(Jornal jornal) {
     if (this.jornaisSeguidos.contains(jornal)) return false;
-    this.add(jornal);
+    this.jornaisSeguidos.add(jornal);
     return true;
   }
 

@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class Noticia {
   
@@ -8,6 +9,10 @@ public class Noticia {
   private Date   data;
   private String url;
   private String resumo;
+
+  public Noticia() {
+
+  }
 
   public Noticia(String titulo, Date data, String url, String resumo) {
     this.titulo = titulo;
@@ -28,7 +33,7 @@ public class Noticia {
   }
 
   public boolean setData(Date data) {
-    if (data != this.data) return false;
+    if (this.data != null && this.data.after(data)) return false;
     this.data = data;
     return true;
   }
@@ -36,7 +41,7 @@ public class Noticia {
 
   public boolean setUrl(String url) {
     // TODO usar regex pra detectar se é URL válida
-    if (url.isBlank()) return false; 
+    if (url.isBlank()) return false;
     this.url = url;
     return true;
   }

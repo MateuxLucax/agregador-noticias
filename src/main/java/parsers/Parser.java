@@ -3,6 +3,7 @@ package parsers;
 import models.Noticia;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public abstract class Parser {
 

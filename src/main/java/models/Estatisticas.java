@@ -1,18 +1,20 @@
 package models;
 
+import enums.Regiao;
+
 import java.util.Date;
 
 public class Estatisticas
 {
     private final Regiao regiao;
-    private final Date   dataColeta;
-    private final int    casos;
-    private final int    recuperados;
-    private final int    obitos;
-    private final int    vacinados;
-    private final int    segundaDose;
+    private Date   dataColeta;
+    private int    casos;
+    private int    recuperados;
+    private int    obitos;
+    private int    vacinados;
+    private int    segundaDose;
 
-    public Contagem(Regiao regiao) {
+    public Estatisticas(Regiao regiao) {
         this.regiao = regiao;
         preencherDados();
     }
