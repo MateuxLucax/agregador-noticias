@@ -160,7 +160,7 @@ public class BBCParser extends Parser {
     private Noticia getNoticiaFromContent(Element item, Date date) throws Exception {
         Noticia noticia = new Noticia();
 
-        if (noticia.setUrl("https://www.bbc.com/" + item.select("a.qa-heading-link").attr("href")) &&
+        if (noticia.setUrl("https://www.bbc.com" + item.select("a.qa-heading-link").attr("href")) &&
             noticia.setResumo(item.select("p.qa-story-summary").first().text()) &&
             noticia.setTitulo(item.getElementsByTag("h3").first().text()) &&
             noticia.setData(date)
