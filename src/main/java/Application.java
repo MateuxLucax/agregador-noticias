@@ -28,18 +28,17 @@ public class Application {
     public static File   arquivoJornaisSeguidos;
 
 
-    public static boolean initArquivos() {
+    public static void initArquivos() {
         String homepath;
         try {
             homepath = System.getenv("HOMEPATH");  // Geralmente C:/Users/user
         } catch (NullPointerException e) {
             // System.getenv() causa NullPointerException caso a variável não exista
             System.out.println("ERRO: Configure a variável HOMEPATH do seu sistema.");
-            return false;
+            return;
         }
         diretorio = homepath + "/agregador-noticias";
         arquivoJornaisSeguidos = new File(diretorio + "/jornais-seguidos.txt");
-        return true;
     }
 
     public static void seguirJornal(int i) {
