@@ -19,14 +19,12 @@ public class BBCParser extends Parser {
     private static SimpleDateFormat formatter;
 
     public BBCParser() {
-        MAX_PAGES = 10;
-        formatter = new SimpleDateFormat("HH:mm dd MMMM yyyy", new Locale("pt","BR"));
-        formatter.setTimeZone(TimeZone.getTimeZone("UTC-3"));
+        this(10);
     }
 
     public BBCParser(int maxPages) {
         MAX_PAGES = maxPages;
-        formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        formatter = new SimpleDateFormat("HH:mm dd MMMM yyyy", new Locale("pt","BR"));
         formatter.setTimeZone(TimeZone.getTimeZone("UTC-3"));
     }
 
