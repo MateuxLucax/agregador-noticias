@@ -1,9 +1,6 @@
 import models.Jornal;
 import models.Noticia;
-import parsers.BBCParser;
-import parsers.FSPParser;
-import parsers.G1Parser;
-import parsers.Parser;
+import parsers.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,19 +8,18 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.Scanner;
+import java.util.Formatter;
 
 public class Application {
 
-    public static Jornal[] jornais = {
+    public static final Jornal[] jornais = {
         new Jornal("G1", "https://g1.globo.com/", new G1Parser()),
         new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/", new FSPParser()),
         new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser())
     };
-
-    // se jornalSeguido[i] então mostramos as notícias de jornais[i]
     public static boolean[] jornalSeguido = new boolean[jornais.length];
+    // se jornalSeguido[i] então mostramos as notícias de jornais[i]
 
     public static String diretorio;
     public static File   arquivoJornaisSeguidos;
@@ -31,7 +27,7 @@ public class Application {
 
     public static void initArquivos() {
         try {
-            diretorio = System.getProperty("user.dir");
+            diretorio              = System.getProperty("user.dir");
             arquivoJornaisSeguidos = new File(diretorio + "/jornais-seguidos.txt");
         } catch (NullPointerException e) {
             System.out.println("ERRO: Não foi possível obter o diretório do projeto.");
@@ -77,6 +73,7 @@ public class Application {
         fmt.close();
     }
 
+
     public static void main(String[] args) {
 
         initArquivos();
@@ -90,7 +87,7 @@ public class Application {
 
                     Instant now = Instant.now();
                     Date yesterday = Date.from(now.minus(1, ChronoUnit.DAYS));
-                    Date today = Date.from(now.truncatedTo(ChronoUnit.DAYS));
+                    Date today     = Date.from(now.truncatedTo(ChronoUnit.DAYS));
 
                     System.out.println(jornais[i].getNome());
                     ArrayList<Noticia> ns = p.getNoticias(yesterday, today);
@@ -105,6 +102,6 @@ public class Application {
             System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");
             System.out.println("e coloque-os em " + diretorio);
         }
-    }
 
+    }
 }
