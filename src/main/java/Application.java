@@ -1,24 +1,23 @@
 import models.Jornal;
 import models.Noticia;
-
+import parsers.FSPParser;
 import parsers.G1Parser;
 import parsers.Parser;
 
-import java.sql.Date;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-
-import java.util.Scanner;
-import java.util.Formatter;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Formatter;
+import java.util.Scanner;
 
 public class Application {
 
     public static Jornal[] jornais = {
-            new Jornal("G1", "https://g1.globo.com/", new G1Parser())
+        new Jornal("G1", "https://g1.globo.com/", new G1Parser(10)),
+        new Jornal("Folha de São Paul", "https://www.folha.uol.com.br/", new FSPParser())
     };
 
     // se jornalSeguido[i] então mostramos as notícias de jornais[i]
@@ -29,16 +28,12 @@ public class Application {
 
 
     public static void initArquivos() {
-        String homepath;
         try {
-            homepath = System.getenv("HOMEPATH");  // Geralmente C:/Users/user
+            diretorio = System.getProperty("user.dir");
+            arquivoJornaisSeguidos = new File(diretorio + "/jornais-seguidos.txt");
         } catch (NullPointerException e) {
-            // System.getenv() causa NullPointerException caso a variável não exista
-            System.out.println("ERRO: Configure a variável HOMEPATH do seu sistema.");
-            return;
+            System.out.println("ERRO: Não foi possível obter o diretório do projeto.");
         }
-        diretorio = homepath + "/agregador-noticias";
-        arquivoJornaisSeguidos = new File(diretorio + "/jornais-seguidos.txt");
     }
 
     public static void seguirJornal(int i) {
