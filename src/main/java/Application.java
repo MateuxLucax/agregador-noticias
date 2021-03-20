@@ -21,18 +21,7 @@ public class Application {
     public static boolean[] jornalSeguido = new boolean[jornais.length];
     // se jornalSeguido[i] então mostramos as notícias de jornais[i]
 
-    public static String diretorio;
-    public static File   arquivoJornaisSeguidos;
-
-
-    public static void initArquivos() {
-        try {
-            diretorio              = System.getProperty("user.dir");
-            arquivoJornaisSeguidos = new File(diretorio + "/jornais-seguidos.txt");
-        } catch (NullPointerException e) {
-            System.out.println("ERRO: Não foi possível obter o diretório do projeto.");
-        }
-    }
+    public static EstatisticasPorRegiao estatisticasPorRegiao = new EstatisticasPorRegiao();
 
     public static void seguirJornal(int i) {
         if (i >= 0 && i < jornalSeguido.length)
@@ -44,42 +33,13 @@ public class Application {
             jornalSeguido[i] = false;
     }
 
-    public static void loadJornaisSeguidos() throws FileNotFoundException {
-        Scanner scn = new Scanner(arquivoJornaisSeguidos);
-        scn.useDelimiter(";");
-
-        // Formato do arquivo jornais-seguidos.txt:
-        // Por exemplo, "true;false;true"
-        // carrega jornalSeguido[0] = true, jornalSeguido[1] = false, jornalSeguido[2] = true
-
-        int i;
-        for (i=0; scn.hasNext() && i < jornais.length; i++)
-            jornalSeguido[i] = Boolean.parseBoolean( scn.next() );
-
-        if (i < jornais.length) {
-            System.out.println("AVISO: jornais-seguidos.txt incompleto, faltam jornais.");
-            // Mas não precisa retornar false; só seguir o resto dos jornais por padrão
-            for (; i < jornais.length; i++)
-                jornalSeguido[i] = true;
-        }
-    }
-
-    public static void saveJornaisSeguidos() throws FileNotFoundException {
-        Formatter fmt = new Formatter(arquivoJornaisSeguidos);
-        int n = jornalSeguido.length;
-        for (int i=0; i < n-1; i++)
-            fmt.format("%b;", jornalSeguido[i]);
-        fmt.format("%b", jornalSeguido[n-1]);
-        fmt.close();
-    }
-
 
     public static void main(String[] args) {
 
-        initArquivos();
+        Arquivos.initArquivos();
 
         try {
-            loadJornaisSeguidos();
+            Arquivos.loadJornaisSeguidos(jornalSeguido);
 
             for (int i = 0; i < jornais.length; i++) {
                 if (jornalSeguido[i]) {
@@ -96,12 +56,13 @@ public class Application {
                 }
             }
 
-            saveJornaisSeguidos();
+            estatisticasPorRegiao.printTabela();
+
+            Arquivos.saveJornaisSeguidos(jornalSeguido);
         } catch (FileNotFoundException e) {
             System.out.println("Algum(ns) arquivo(s) estão faltando.");
             System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");
-            System.out.println("e coloque-os em " + diretorio);
+            System.out.println("e coloque-os em " + Arquivos.diretorio);
         }
-
     }
 }

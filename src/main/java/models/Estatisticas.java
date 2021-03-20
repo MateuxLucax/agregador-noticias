@@ -1,5 +1,9 @@
 package models;
 
+import enums.Regiao;
+
+import java.text.DecimalFormat;
+
 public class Estatisticas {
 
     private final long casos;
@@ -8,10 +12,10 @@ public class Estatisticas {
     private final long vacinados;
     private final long segundaDose;
 
-    public Estatisticas(long casos, long recuperados, long obitos, long vacinados, long segundaDose) {
+    public Estatisticas(long casos, long obitos, long recuperados, long vacinados, long segundaDose) {
         this.casos       = casos;
-        this.recuperados = recuperados;
         this.obitos      = obitos;
+        this.recuperados = recuperados;
         this.vacinados   = vacinados;
         this.segundaDose = segundaDose;
     }
