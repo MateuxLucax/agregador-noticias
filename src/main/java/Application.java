@@ -16,8 +16,8 @@ import java.util.Scanner;
 public class Application {
 
     public static Jornal[] jornais = {
-        new Jornal("G1", "https://g1.globo.com/", new G1Parser(10)),
-        new Jornal("Folha de São Paul", "https://www.folha.uol.com.br/", new FSPParser())
+        new Jornal("G1", "https://g1.globo.com/", new G1Parser()),
+        new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/", new FSPParser())
     };
 
     // se jornalSeguido[i] então mostramos as notícias de jornais[i]

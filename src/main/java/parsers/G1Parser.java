@@ -27,6 +27,13 @@ public class G1Parser extends Parser {
     private static SimpleDateFormat formatter;
     private static String postUrl;
 
+    public G1Parser() {
+        MAX_PAGES = 10;
+        formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC-3"));
+        postUrl = this.getPostsUrl();
+    }
+
     public G1Parser(int maxPages) {
         MAX_PAGES = maxPages;
         formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
