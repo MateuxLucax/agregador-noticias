@@ -3,7 +3,6 @@ import models.Noticia;
 import parsers.BBCParser;
 import parsers.FSPParser;
 import parsers.G1Parser;
-import parsers.Parser;
 
 import java.io.IOException;
 import java.time.Instant;

@@ -33,16 +33,6 @@ public class Jornal {
     public String  getUrl()    { return url; }
     public boolean seguido()   { return seguido; }
 
-    public Noticia getNoticia(String titulo) {
-        Pattern pattern = Pattern.compile(titulo);
-
-        return noticias
-                .stream()
-                .filter(noticia -> pattern.matcher(noticia.getTitulo()).find())
-                .findFirst()
-                .orElse(null);
-    }
-
     public ArrayList<Noticia> getNoticiasRecentes() {
         Date yesterday = Date.from(Instant.now().minus(1, ChronoUnit.DAYS));
 
@@ -54,6 +44,13 @@ public class Jornal {
 
     public ArrayList<Noticia> getNoticias() {
         return noticias;
+    }
+
+    public ArrayList<Noticia> getNoticias(String titulo) {
+        return noticias
+                .stream()
+                .filter(noticia -> noticia.getTitulo().contains(titulo))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
@@ -93,7 +90,6 @@ public class Jornal {
         return "Jornal{" +
                 "nome='" + nome + '\'' +
                 ", url='" + url + '\'' +
-                ", parser=" + parser +
                 ", seguido=" + seguido +
                 ", noticias=" + noticias +
                 '}';
