@@ -1,3 +1,4 @@
+import models.Jornal;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Formatter;
@@ -25,34 +26,39 @@ public class DadosUsuario {
     }
 
 
-    public String getDiretorio() { return diretorio; }
+    public String getDiretorio() {
+        return diretorio;
+    }
 
-    public void loadJornaisSeguidos(boolean[] jornalSeguido) throws FileNotFoundException {
-        int n = jornalSeguido.length;
+    public void loadJornaisSeguidos(Jornal[] jornais) throws FileNotFoundException {
+        int n = jornais.length;
 
         Scanner scn = new Scanner(arquivoJornaisSeguidos);
         scn.useDelimiter(";");
 
         int i;
-        for (i=0; scn.hasNext() && i < n; i++)
-            jornalSeguido[i] = Boolean.parseBoolean( scn.next() );
+        for (i=0; scn.hasNext() && i < n; i++) {
+            boolean seguir = Boolean.parseBoolean( scn.next() );
+            if (seguir) jornais[i].seguir();
+            else        jornais[i].naoSeguir();
+        }
 
         if (i < n) {
             System.out.println("AVISO: faltam jornais em jornais-seguidos.txt. O resto será seguido por padrão.");
             for (; i < n; i++)
-                jornalSeguido[i] = true;
+                jornais[i].seguir();
         }
         scn.close();
     }
 
-    public void saveJornaisSeguidos(boolean[] jornalSeguido) throws FileNotFoundException {
-        int n = jornalSeguido.length;
+    public void saveJornaisSeguidos(Jornal[] jornais) throws FileNotFoundException {
+        int n = jornais.length;
 
         Formatter fmt = new Formatter(arquivoJornaisSeguidos);
 
         for (int i=0; i < n-1; i++)
-            fmt.format("%b;", jornalSeguido[i]);
-        fmt.format("%b", jornalSeguido[n-1]);
+            fmt.format("%b;", jornais[i].seguido());
+        fmt.format("%b", jornais[n-1].seguido());
 
         fmt.close();
     }

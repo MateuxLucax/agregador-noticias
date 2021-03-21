@@ -16,40 +16,25 @@ public class Application {
         new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser())
     };
 
-    public static boolean[] jornalSeguido = new boolean[jornais.length];
-    // se jornalSeguido[i] então mostramos as notícias de jornais[i]
-
     public static EstatisticasPorRegiao estatisticas = EstatisticasPorRegiao.getInstance();
     public static DadosUsuario          dadosUsuario = DadosUsuario.getInstance();
-
-
-
-    public static void seguirJornal(int i) {
-        if (i >= 0 && i < jornalSeguido.length)
-            jornalSeguido[i] = true;
-    }
-
-    public static void naoSeguirJornal(int i) {
-        if (i >= 0 && i < jornalSeguido.length)
-            jornalSeguido[i] = false;
-    }
 
 
 
     public static void main(String[] args) {
 
         try {
-            dadosUsuario.loadJornaisSeguidos(jornalSeguido);
+            dadosUsuario.loadJornaisSeguidos(jornais);
 
-            for (int i = 0; i < jornais.length; i++) {
-                if (jornalSeguido[i]) {
-                    Parser par = jornais[i].getParser();
+            for (Jornal jornal : jornais) {
+                if (jornal.seguido()) {
+                    Parser par = jornal.getParser();
 
                     Instant now = Instant.now();
                     Date yesterday = Date.from(now.minus(1, ChronoUnit.DAYS));
                     Date today     = Date.from(now.truncatedTo(ChronoUnit.DAYS));
 
-                    System.out.println(jornais[i].getNome());
+                    System.out.println(jornal.getNome());
                     ArrayList<Noticia> ns = par.getNoticiasRecentes();
                     for (Noticia n : ns)
                         System.out.println(n);
@@ -58,7 +43,7 @@ public class Application {
 
             estatisticas.printTabela();
 
-            dadosUsuario.saveJornaisSeguidos(jornalSeguido);
+            dadosUsuario.saveJornaisSeguidos(jornais);
         } catch (FileNotFoundException e) {
             System.out.println("Algum(ns) arquivo(s) estão faltando.");
             System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");

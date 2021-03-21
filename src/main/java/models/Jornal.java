@@ -7,21 +7,25 @@ import java.util.Objects;
 
 public class Jornal {
 
-    private final String             nome;
-    private final String             url;
-    private final Parser             parser;
-    private       ArrayList<Noticia> noticias;
+    private final String   nome;
+    private final String   url;
+    private final Parser   parser;
+    private       boolean seguido;
 
     public Jornal(String nome, String url, Parser parser) {
-        this.nome = nome;
-        this.url = url;
-        this.parser = parser;
-        noticias = new ArrayList<>();
+        this.nome    = nome;
+        this.url     = url;
+        this.parser  = parser;
+        this.seguido = true;
     }
 
-    public String             getNome()     { return nome; }
-    public String             getUrl()      { return url; }
-    public Parser             getParser()   { return parser; }
+    public void seguir()    { seguido = true; }
+    public void naoSeguir() { seguido = false; }
+
+    public String  getNome()   { return nome; }
+    public String  getUrl()    { return url; }
+    public Parser  getParser() { return parser; }
+    public boolean seguido()   { return seguido; }
 
     @Override
     public boolean equals(Object o) {
@@ -41,7 +45,7 @@ public class Jornal {
         return "Jornal{" +
                 "nome='" + nome + '\'' +
                 ", url='" + url + '\'' +
-                ", noticias=" + noticias +
+                ", seguido='" + seguido + '\'' +
                 '}';
     }
 }
