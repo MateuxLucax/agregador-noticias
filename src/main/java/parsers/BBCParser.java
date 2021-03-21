@@ -124,11 +124,9 @@ public class BBCParser extends Parser {
                 try {
                     Date date = getNewsDate(item);
 
-                    if (date.before(Date.from(yesterday))) {
-                        return;
+                    if (date.after(Date.from(yesterday))) {
+                        noticias.add(getNoticiaFromContent(item, date));
                     }
-
-                    noticias.add(getNoticiaFromContent(item, date));
                 } catch (Exception e) {
                     System.out.println("AVISO: " + e.getMessage());
                 }
@@ -144,7 +142,7 @@ public class BBCParser extends Parser {
             Document document = Jsoup.connect(url).ignoreContentType(true).userAgent(USER_AGENT).get();
 
             Element body = document.body();
-            return body.select("ol.lx-stream__feed").first().getElementsByTag("li");
+            return body.select("ol.lx-stream__feed").first().select("li.lx-stream__post-container");
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -152,24 +150,39 @@ public class BBCParser extends Parser {
     }
 
     private Date getNewsDate(Element item) throws ParseException {
-        return formatter.parse(item.getElementsByTag("time").first().getElementsByTag("span").last().text());
+        try {
+            return formatter.parse(item.getElementsByTag("time").first().getElementsByTag("span").last().text());
+        } catch (ParseException e) {
+            Date today = Date.from(Instant.now().truncatedTo(ChronoUnit.DAYS));
+            SimpleDateFormat todayFormatter = new SimpleDateFormat( " dd MMMM yyyy", new Locale("pt","BR"));
+            return formatter.parse(item.getElementsByTag("time").first().getElementsByTag("span").last().text() + todayFormatter.format(today));
+        }
     }
 
     private Noticia getNoticiaFromContent(Element item, Date date) throws Exception {
         Noticia noticia = new Noticia();
 
         if (noticia.setUrl("https://www.bbc.com" + item.select("a.qa-heading-link").attr("href")) &&
-            noticia.setResumo(item.select("p.qa-story-summary").first().text()) &&
+            noticia.setResumo(getNewsSummary(item)) &&
             noticia.setTitulo(item.getElementsByTag("h3").first().text()) &&
             noticia.setData(date)
         ) {
             return noticia;
         }
 
-        throw new Exception("something went wrong while getting news BBC.");
+        throw new Exception("Não foi possível coletar uma notícia da BBC.");
     }
 
     private boolean isSearchedUrl(Element item, String search) {
         return ("https://www.bbc.com/" + item.select("a.qa-heading-link").attr("href")).equalsIgnoreCase(search);
+    }
+
+    private String getNewsSummary(Element item) {
+        Elements summaryElements = item.select("p.qa-story-summary");
+        if (summaryElements.isEmpty()) {
+            return "Não foi possível obter o resumo dessa notícia.";
+        }
+
+        return summaryElements.first().text();
     }
 }

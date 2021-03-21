@@ -138,15 +138,13 @@ public class G1Parser extends Parser {
         while (page <= MAX_PAGES) {
             getItems(getDocument(postUrl + page)).forEach(item -> {
                 try {
-                    Date date = getPostDate(item);
-
-                    if (date.before(Date.from(yesterday))) {
-                        return;
-                    }
-
                     if (isAggregatedPosts(item)) return;
 
-                    noticias.add(getNoticiaFromContent(getItemContent(item), date));
+                    Date date = getPostDate(item);
+
+                    if (date.after(Date.from(yesterday))) {
+                        noticias.add(getNoticiaFromContent(getItemContent(item), date));
+                    }
                 } catch (Exception e) {
                     System.out.println("AVISO: " + e.getMessage());
                 }
@@ -190,7 +188,7 @@ public class G1Parser extends Parser {
     }
 
     private Date getPostDate(JsonElement item) throws ParseException {
-        return formatter.parse(((JsonObject) item).get("modified").getAsString());
+        return formatter.parse(((JsonObject) item).get("created").getAsString());
     }
 
     private JsonObject getItemContent(JsonElement item) {
@@ -198,17 +196,19 @@ public class G1Parser extends Parser {
     }
 
     private Noticia getNoticiaFromContent(JsonObject content, Date date) throws Exception {
-        Noticia noticia = new Noticia();
+        try {
+            Noticia noticia = new Noticia();
 
-        if (noticia.setUrl(content.get("url").getAsString()) &&
-            noticia.setResumo(content.get("summary").getAsString()) &&
-            noticia.setTitulo(content.get("title").getAsString()) &&
-            noticia.setData(date)
-        ) {
-            return noticia;
-        }
+            if (noticia.setUrl(content.get("url").getAsString()) &&
+                    noticia.setResumo(content.get("summary").getAsString()) &&
+                    noticia.setTitulo(content.get("title").getAsString()) &&
+                    noticia.setData(date)
+            ) {
+                return noticia;
+            }
+        } catch (Exception ignored) { }
 
-        throw new Exception("Algo deu errado ao tentar coletar uma notícia do G1.");
+        throw new Exception("Não foi possível coletar uma notícia do G1.");
     }
 
     private boolean isSearchedUrl(JsonObject content, String search) {

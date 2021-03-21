@@ -49,6 +49,8 @@ public class FSPParser extends Parser {
 
         Objects.requireNonNull(getNewsElements()).forEach(news -> {
             try {
+                if (hasOutBrain(news)) return;
+
                 Element headlineContent = getHeadlineContent(news);
 
                 noticias.add(getNoticiaFromContent(headlineContent, getNewsDate(headlineContent)));
@@ -67,13 +69,15 @@ public class FSPParser extends Parser {
 
         for (Element news: Objects.requireNonNull(getNewsElements())) {
             try {
-                Element headlineContent = getHeadlineContent(news);
+                if (!hasOutBrain(news)) {
+                    Element headlineContent = getHeadlineContent(news);
 
-                Date date = getNewsDate(headlineContent);
+                    Date date = getNewsDate(headlineContent);
 
-                if (pesquisaInstant.equals(date.toInstant().truncatedTo(ChronoUnit.DAYS))) {
-                    noticias.add(getNoticiaFromContent(headlineContent, date));
+                    if (pesquisaInstant.equals(date.toInstant().truncatedTo(ChronoUnit.DAYS))) {
+                        noticias.add(getNoticiaFromContent(headlineContent, date));
 
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("AVISO: " + e.toString());
@@ -89,12 +93,14 @@ public class FSPParser extends Parser {
 
         for (Element news: Objects.requireNonNull(getNewsElements())) {
             try {
-                Element headlineContent = getHeadlineContent(news);
+                if (!hasOutBrain(news)) {
+                    Element headlineContent = getHeadlineContent(news);
 
-                Date date = getNewsDate(headlineContent);
+                    Date date = getNewsDate(headlineContent);
 
-                if (!date.before(dataInicial) || !date.after(dataFinal)) {
-                    noticias.add(getNoticiaFromContent(headlineContent, date));
+                    if (!date.before(dataInicial) || !date.after(dataFinal)) {
+                        noticias.add(getNoticiaFromContent(headlineContent, date));
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("AVISO: " + e.toString());
@@ -112,13 +118,14 @@ public class FSPParser extends Parser {
 
         for (Element news: Objects.requireNonNull(getNewsElements())) {
             try {
-                Element headlineContent = getHeadlineContent(news);
+                if (!hasOutBrain(news)) {
+                    Element headlineContent = getHeadlineContent(news);
 
-                Date date = getNewsDate(headlineContent);
+                    Date date = getNewsDate(headlineContent);
 
-                if (date.after(Date.from(yesterday))) {
-                    noticias.add(getNoticiaFromContent(headlineContent, date));
-
+                    if (date.after(Date.from(yesterday))) {
+                        noticias.add(getNoticiaFromContent(headlineContent, date));
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("AVISO: " + e.toString());
@@ -151,7 +158,7 @@ public class FSPParser extends Parser {
             return noticia;
         }
 
-        throw new Exception("algo deu errado ao tentar coletar uma notícia do G1.");
+        throw new Exception("Não foi possível coletar uma notícia da Folha de São Paulo.");
     }
 
     private Date getNewsDate(Element headlineContent) throws ParseException {
@@ -164,5 +171,9 @@ public class FSPParser extends Parser {
 
     private boolean isSearchedUrl(Element headlineContent, String search) {
         return headlineContent.getElementsByTag("a").first().attr("href").equalsIgnoreCase(search);
+    }
+
+    private boolean hasOutBrain(Element news) {
+        return !news.select(".OUTBRAIN").isEmpty();
     }
 }
