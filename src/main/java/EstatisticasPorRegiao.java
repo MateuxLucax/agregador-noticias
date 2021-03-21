@@ -7,14 +7,28 @@ import java.util.HashMap;
 
 public class EstatisticasPorRegiao {
 
-    private final HashMap<Regiao, Estatisticas> estatisticas;
-
+    private        final HashMap<Regiao, Estatisticas> estatisticas;
     private static final Regiao[] REGIOES    = Regiao.values();
     private static final String   USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
+    private static       EstatisticasPorRegiao instance;
 
-    public EstatisticasPorRegiao() {
+    public static EstatisticasPorRegiao getInstance() {
+        if (instance == null)
+            instance = new EstatisticasPorRegiao();
+        return instance;
+    }
+
+    private EstatisticasPorRegiao() {
         estatisticas = new HashMap<>(REGIOES.length);
         preencherDados();
+    }
+
+    private Regiao csvStringToRegiao(String s) {
+        Regiao regiao = Regiao.BRASIL;
+        for (Regiao r : REGIOES)     // "TOTAL" -> BRASIL pelo valor padrão
+            if (s.equals(r.name()))  // O resto "SP" -> SP etc.
+                regiao = r;
+        return regiao;
     }
 
     private void preencherDados() {
@@ -24,18 +38,9 @@ public class EstatisticasPorRegiao {
                                            .get().body().text();
             String[] linhas = csv.split(" ");
             for (int i=1; i<linhas.length; i++) {  // Ignora 1a linha (cabeçalho)
-                String linha = linhas[i];
+                String[] valores = linhas[i].split(",");
 
-                String[] valores = linha.split(",");
-
-                Regiao regiao = Regiao.BRASIL;  // valor padrão
-                String valorRegiao = valores[1];
-                if (!valorRegiao.equals("TOTAL")) {
-                    for (Regiao r : REGIOES)
-                        if (valorRegiao.equals(r.name()))
-                            regiao = r;
-                }
-
+                Regiao regiao = csvStringToRegiao(valores[1]);
                 long casos       = Long.parseLong(valores[2]);
                 long obitos      = Long.parseLong(valores[5]);
                 long recuperados = Long.parseLong(valores[11]);
@@ -59,7 +64,7 @@ public class EstatisticasPorRegiao {
         df.setGroupingSize(3);
 
         System.out.printf("%8s%13s%13s%13s%13s%13s\n",
-                "Regiões", "Casos", "Óbitos", "Recuperados", "Vacinados", "Segunda dose");
+                "Região", "Casos", "Óbitos", "Recuperados", "Vacinados", "Segunda dose");
         for (Regiao r : REGIOES) {
             Estatisticas e = estatisticas.get(r);
             System.out.printf("%8s%13s%13s%13s%13s%13s\n",

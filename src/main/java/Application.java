@@ -2,14 +2,11 @@ import models.Jornal;
 import models.Noticia;
 import parsers.*;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
-import java.util.Formatter;
 
 public class Application {
 
@@ -18,10 +15,14 @@ public class Application {
         new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/", new FSPParser()),
         new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser())
     };
+
     public static boolean[] jornalSeguido = new boolean[jornais.length];
     // se jornalSeguido[i] então mostramos as notícias de jornais[i]
 
-    public static EstatisticasPorRegiao estatisticasPorRegiao = new EstatisticasPorRegiao();
+    public static EstatisticasPorRegiao estatisticas = EstatisticasPorRegiao.getInstance();
+    public static DadosUsuario          dadosUsuario = DadosUsuario.getInstance();
+
+
 
     public static void seguirJornal(int i) {
         if (i >= 0 && i < jornalSeguido.length)
@@ -34,35 +35,34 @@ public class Application {
     }
 
 
+
     public static void main(String[] args) {
 
-        Arquivos.initArquivos();
-
         try {
-            Arquivos.loadJornaisSeguidos(jornalSeguido);
+            dadosUsuario.loadJornaisSeguidos(jornalSeguido);
 
             for (int i = 0; i < jornais.length; i++) {
                 if (jornalSeguido[i]) {
-                    Parser p = jornais[i].getParser();
+                    Parser par = jornais[i].getParser();
 
                     Instant now = Instant.now();
                     Date yesterday = Date.from(now.minus(1, ChronoUnit.DAYS));
                     Date today     = Date.from(now.truncatedTo(ChronoUnit.DAYS));
 
                     System.out.println(jornais[i].getNome());
-                    ArrayList<Noticia> ns = p.getNoticiasRecentes();
+                    ArrayList<Noticia> ns = par.getNoticiasRecentes();
                     for (Noticia n : ns)
                         System.out.println(n);
                 }
             }
 
-            estatisticasPorRegiao.printTabela();
+            estatisticas.printTabela();
 
-            Arquivos.saveJornaisSeguidos(jornalSeguido);
+            dadosUsuario.saveJornaisSeguidos(jornalSeguido);
         } catch (FileNotFoundException e) {
             System.out.println("Algum(ns) arquivo(s) estão faltando.");
             System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");
-            System.out.println("e coloque-os em " + Arquivos.diretorio);
+            System.out.println("e coloque-os em " + dadosUsuario.getDiretorio());
         }
     }
 }
