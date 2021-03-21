@@ -13,17 +13,14 @@ import java.util.Date;
 public class Application {
 
     public static final Jornal[] jornais = {
-        new Jornal("G1", "https://g1.globo.com/", new G1Parser()),
-        new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/", new FSPParser()),
-        new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser())
+        new Jornal("G1",                 "https://g1.globo.com/",           new G1Parser()),
+        new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()),
+        new Jornal("BBC",                "https://www.bbc.com/portuguese/", new BBCParser())
     };
 
     public static EstatisticasPorRegiao estatisticas = EstatisticasPorRegiao.getInstance();
     public static DadosUsuario          dadosUsuario = DadosUsuario.getInstance();
-
-
-
-    public static ArrayList<Noticia> noticiasSalvas;
+    public static ArrayList<Noticia>    noticiasSalvas;
 
     public static void lerMaisTarde(Noticia n) {
         if (!noticiasSalvas.contains(n))
@@ -33,8 +30,6 @@ public class Application {
     public static void removerLerMaisTarde(Noticia n) {
         noticiasSalvas.remove(n);
     }
-
-
 
     public static void main(String[] args) {
 

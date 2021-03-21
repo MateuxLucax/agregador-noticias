@@ -16,13 +16,14 @@ public class Jornal {
     private final String             url;
     private final Parser             parser;
     private       boolean            seguido;
-    private final ArrayList<Noticia> noticias = new ArrayList<>();
+    private final ArrayList<Noticia> noticias;
 
     public Jornal(String nome, String url, Parser parser) {
-        this.nome    = nome;
-        this.url     = url;
-        this.parser  = parser;
-        this.seguido = true;
+        this.nome     = nome;
+        this.url      = url;
+        this.parser   = parser;
+        this.seguido  = true;
+        this.noticias = new ArrayList<>();
         noticias.addAll(parser.getNoticias());
     }
 
@@ -33,15 +34,6 @@ public class Jornal {
     public String  getUrl()    { return url; }
     public boolean seguido()   { return seguido; }
 
-    public ArrayList<Noticia> getNoticiasRecentes() {
-        Date yesterday = Date.from(Instant.now().minus(1, ChronoUnit.DAYS));
-
-        return noticias
-                .stream()
-                .filter(noticia -> noticia.getData().after(yesterday))
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
     public ArrayList<Noticia> getNoticias() {
         return noticias;
     }
@@ -51,6 +43,11 @@ public class Jornal {
                 .stream()
                 .filter(predicate)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<Noticia> getNoticiasRecentes() {
+        Date yesterday = Date.from(Instant.now().minus(1, ChronoUnit.DAYS));
+        return filtrarNoticias(noticia -> noticia.getData().after(yesterday));
     }
 
     public ArrayList<Noticia> getNoticias(String titulo) {
