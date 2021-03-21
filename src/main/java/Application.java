@@ -2,7 +2,7 @@ import models.Jornal;
 import models.Noticia;
 import parsers.*;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -21,11 +21,31 @@ public class Application {
 
 
 
+    public static ArrayList<Noticia> noticiasSalvas;
+
+    public static void lerMaisTarde(Noticia n) {
+        if (!noticiasSalvas.contains(n))
+            noticiasSalvas.add(n);
+    }
+
+    public static void removerLerMaisTarde(Noticia n) {
+        noticiasSalvas.remove(n);
+    }
+
+
+
     public static void main(String[] args) {
 
         try {
-            dadosUsuario.loadJornaisSeguidos(jornais);
 
+            noticiasSalvas = dadosUsuario.loadNoticias();
+            if (noticiasSalvas.size() > 0) {
+                System.out.println("Notícias que você salvou para ler mais tarde: ");
+                for (Noticia n : noticiasSalvas)
+                    System.out.println(n);
+            }
+
+            dadosUsuario.loadJornaisSeguidos(jornais);
             for (Jornal jornal : jornais) {
                 if (jornal.seguido()) {
                     Parser par = jornal.getParser();
@@ -44,7 +64,9 @@ public class Application {
             estatisticas.printTabela();
 
             dadosUsuario.saveJornaisSeguidos(jornais);
-        } catch (FileNotFoundException e) {
+            dadosUsuario.saveNoticias(noticiasSalvas);
+
+        } catch (IOException e) {  // FileNotFoundException extends IOException
             System.out.println("Algum(ns) arquivo(s) estão faltando.");
             System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");
             System.out.println("e coloque-os em " + dadosUsuario.getDiretorio());
