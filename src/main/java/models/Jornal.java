@@ -7,7 +7,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Jornal {
@@ -46,31 +46,28 @@ public class Jornal {
         return noticias;
     }
 
-    public ArrayList<Noticia> getNoticias(String titulo) {
+    private ArrayList<Noticia> filtrarNoticias(Predicate<Noticia> predicate) {
         return noticias
                 .stream()
-                .filter(noticia -> noticia.getTitulo().contains(titulo))
+                .filter(predicate)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<Noticia> getNoticias(String titulo) {
+        return filtrarNoticias(noticia -> noticia.getTitulo().contains(titulo)) ;
     }
 
     public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
         Instant pesquisaInstant = dataPesquisa.toInstant().truncatedTo(ChronoUnit.DAYS);
-
-        return noticias
-                .stream()
-                .filter(noticia -> pesquisaInstant.equals(noticia.getData().toInstant().truncatedTo(ChronoUnit.DAYS)))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return filtrarNoticias(noticia -> pesquisaInstant.equals(noticia.getData().toInstant().truncatedTo(ChronoUnit.DAYS)));
     }
 
     public ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal) {
         dataInicial.toInstant().truncatedTo(ChronoUnit.DAYS);
         dataFinal.toInstant().truncatedTo(ChronoUnit.DAYS);
-
-        return noticias
-                .stream()
-                .filter(noticia -> (noticia.getData().after(dataInicial) && noticia.getData().before(dataFinal)))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return filtrarNoticias(noticia -> (noticia.getData().after(dataInicial) && noticia.getData().before(dataFinal)));
     }
+
 
     @Override
     public boolean equals(Object o) {
