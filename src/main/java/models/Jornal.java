@@ -2,21 +2,28 @@ package models;
 
 import parsers.Parser;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Jornal {
 
-    private final String   nome;
-    private final String   url;
-    private final Parser   parser;
-    private       boolean seguido;
+    private final String             nome;
+    private final String             url;
+    private final Parser             parser;
+    private       boolean            seguido;
+    private final ArrayList<Noticia> noticias = new ArrayList<>();
 
     public Jornal(String nome, String url, Parser parser) {
         this.nome    = nome;
         this.url     = url;
         this.parser  = parser;
         this.seguido = true;
+        noticias.addAll(parser.getNoticias());
     }
 
     public void seguir()    { seguido = true; }
@@ -24,8 +31,49 @@ public class Jornal {
 
     public String  getNome()   { return nome; }
     public String  getUrl()    { return url; }
-    public Parser  getParser() { return parser; }
     public boolean seguido()   { return seguido; }
+
+    public Noticia getNoticia(String titulo) {
+        Pattern pattern = Pattern.compile(titulo);
+
+        return noticias
+                .stream()
+                .filter(noticia -> pattern.matcher(noticia.getTitulo()).find())
+                .findFirst()
+                .orElse(null);
+    }
+
+    public ArrayList<Noticia> getNoticiasRecentes() {
+        Date yesterday = Date.from(Instant.now().minus(1, ChronoUnit.DAYS));
+
+        return noticias
+                .stream()
+                .filter(noticia -> noticia.getData().after(yesterday))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<Noticia> getNoticias() {
+        return noticias;
+    }
+
+    public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
+        Instant pesquisaInstant = dataPesquisa.toInstant().truncatedTo(ChronoUnit.DAYS);
+
+        return noticias
+                .stream()
+                .filter(noticia -> pesquisaInstant.equals(noticia.getData().toInstant().truncatedTo(ChronoUnit.DAYS)))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal) {
+        dataInicial.toInstant().truncatedTo(ChronoUnit.DAYS);
+        dataFinal.toInstant().truncatedTo(ChronoUnit.DAYS);
+
+        return noticias
+                .stream()
+                .filter(noticia -> (noticia.getData().after(dataInicial) && noticia.getData().before(dataFinal)))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -45,7 +93,9 @@ public class Jornal {
         return "Jornal{" +
                 "nome='" + nome + '\'' +
                 ", url='" + url + '\'' +
-                ", seguido='" + seguido + '\'' +
+                ", parser=" + parser +
+                ", seguido=" + seguido +
+                ", noticias=" + noticias +
                 '}';
     }
 }

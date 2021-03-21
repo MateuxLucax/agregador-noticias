@@ -8,8 +8,6 @@ import org.jsoup.select.Elements;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class FSPParser extends Parser {
@@ -21,27 +19,7 @@ public class FSPParser extends Parser {
     public FSPParser() {
         formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("pt","BR"));
         formatter.setTimeZone(TimeZone.getTimeZone("UTC-3"));
-    }
-
-    @Override
-    public Noticia getNoticia(String url) {
-        Noticia noticia = new Noticia();
-
-        for (Element news: Objects.requireNonNull(getNewsElements())) {
-            try {
-                Element headlineContent = getHeadlineContent(news);
-
-                if (isSearchedUrl(headlineContent, url)) {
-                    noticia = getNoticiaFromContent(headlineContent, getNewsDate(headlineContent));
-                    break;
-                }
-            } catch (Exception e) {
-                System.out.println("AVISO: " + e.toString());
-            }
-        }
-
-        return noticia;
-    }
+    };
 
     @Override
     public ArrayList<Noticia> getNoticias() {
@@ -58,79 +36,6 @@ public class FSPParser extends Parser {
                 System.out.println("AVISO: " + e.toString());
             }
         });
-
-        return noticias;
-    }
-
-    @Override
-    public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
-        Instant pesquisaInstant = dataPesquisa.toInstant().truncatedTo(ChronoUnit.DAYS);
-        ArrayList<Noticia> noticias = new ArrayList<>();
-
-        for (Element news: Objects.requireNonNull(getNewsElements())) {
-            try {
-                if (!hasOutBrain(news)) {
-                    Element headlineContent = getHeadlineContent(news);
-
-                    Date date = getNewsDate(headlineContent);
-
-                    if (pesquisaInstant.equals(date.toInstant().truncatedTo(ChronoUnit.DAYS))) {
-                        noticias.add(getNoticiaFromContent(headlineContent, date));
-
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("AVISO: " + e.toString());
-            }
-        };
-
-        return noticias;
-    }
-
-    @Override
-    public ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal) {
-        ArrayList<Noticia> noticias = new ArrayList<>();
-
-        for (Element news: Objects.requireNonNull(getNewsElements())) {
-            try {
-                if (!hasOutBrain(news)) {
-                    Element headlineContent = getHeadlineContent(news);
-
-                    Date date = getNewsDate(headlineContent);
-
-                    if (!date.before(dataInicial) || !date.after(dataFinal)) {
-                        noticias.add(getNoticiaFromContent(headlineContent, date));
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("AVISO: " + e.toString());
-            }
-        };
-
-        return noticias;
-    }
-
-    @Override
-    public ArrayList<Noticia> getNoticiasRecentes() {
-        Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
-
-        ArrayList<Noticia> noticias = new ArrayList<>();
-
-        for (Element news: Objects.requireNonNull(getNewsElements())) {
-            try {
-                if (!hasOutBrain(news)) {
-                    Element headlineContent = getHeadlineContent(news);
-
-                    Date date = getNewsDate(headlineContent);
-
-                    if (date.after(Date.from(yesterday))) {
-                        noticias.add(getNoticiaFromContent(headlineContent, date));
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("AVISO: " + e.toString());
-            }
-        };
 
         return noticias;
     }
@@ -167,10 +72,6 @@ public class FSPParser extends Parser {
 
     private Element getHeadlineContent(Element news) {
         return news.selectFirst(".c-headline__content");
-    }
-
-    private boolean isSearchedUrl(Element headlineContent, String search) {
-        return headlineContent.getElementsByTag("a").first().attr("href").equalsIgnoreCase(search);
     }
 
     private boolean hasOutBrain(Element news) {

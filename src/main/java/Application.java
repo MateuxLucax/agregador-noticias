@@ -1,6 +1,9 @@
 import models.Jornal;
 import models.Noticia;
-import parsers.*;
+import parsers.BBCParser;
+import parsers.FSPParser;
+import parsers.G1Parser;
+import parsers.Parser;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -48,16 +51,11 @@ public class Application {
             dadosUsuario.loadJornaisSeguidos(jornais);
             for (Jornal jornal : jornais) {
                 if (jornal.seguido()) {
-                    Parser par = jornal.getParser();
-
                     Instant now = Instant.now();
                     Date yesterday = Date.from(now.minus(1, ChronoUnit.DAYS));
                     Date today     = Date.from(now.truncatedTo(ChronoUnit.DAYS));
 
-                    System.out.println(jornal.getNome());
-                    ArrayList<Noticia> ns = par.getNoticiasRecentes();
-                    for (Noticia n : ns)
-                        System.out.println(n);
+                    System.out.println(jornal.toString());
                 }
             }
 

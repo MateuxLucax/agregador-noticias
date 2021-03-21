@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class BBCParser extends Parser {
     protected static final String BASE_URL = "https://www.bbc.com/portuguese/topics/clmq8rgyyvjt/page/";
@@ -29,27 +28,6 @@ public class BBCParser extends Parser {
     }
 
     @Override
-    public Noticia getNoticia(String url) {
-        AtomicReference<Noticia> noticia = new AtomicReference<>(new Noticia());
-        int page = 1;
-
-        while (page <= MAX_PAGES) {
-            Objects.requireNonNull(getNewsElements(BASE_URL + page)).forEach(item -> {
-                try {
-                    if(isSearchedUrl(item, url)) {
-                        noticia.set(getNoticiaFromContent(item, getNewsDate(item)));
-                    }
-                } catch (Exception e) {
-                    System.out.println("AVISO: " + e.toString());
-                }
-            });
-            page++;
-        }
-
-        return noticia.get();
-    }
-
-    @Override
     public ArrayList<Noticia> getNoticias() {
         ArrayList<Noticia> noticias = new ArrayList<>();
 
@@ -61,77 +39,6 @@ public class BBCParser extends Parser {
                     System.out.println("AVISO: " + e.toString());
                 }
             });
-        }
-
-        return noticias;
-    }
-
-    @Override
-    public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
-        Instant pesquisaInstant = dataPesquisa.toInstant().truncatedTo(ChronoUnit.DAYS);
-        ArrayList<Noticia> noticias = new ArrayList<>();
-        int page = 1;
-
-        while (page <= MAX_PAGES) {
-            Objects.requireNonNull(getNewsElements(BASE_URL + page)).forEach(item -> {
-                try {
-                    Date date = getNewsDate(item);
-
-                    if (!pesquisaInstant.equals(date.toInstant().truncatedTo(ChronoUnit.DAYS))) return;
-
-                    noticias.add(getNoticiaFromContent(item, date));
-                } catch (Exception e) {
-                    System.out.println("AVISO: " + e.toString());
-                }
-            });
-            page++;
-        }
-
-        return noticias;
-    }
-
-    @Override
-    public ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal) {
-        ArrayList<Noticia> noticias = new ArrayList<>();
-        int page = 1;
-
-        while (page <= MAX_PAGES) {
-            Objects.requireNonNull(getNewsElements(BASE_URL + page)).forEach(item -> {
-                try {
-                    Date date = getNewsDate(item);
-
-                    if (date.before(dataInicial) || date.after(dataFinal)) return;
-
-                    noticias.add(getNoticiaFromContent(item, date));
-                } catch (Exception e) {
-                    System.out.println("AVISO: " + e.toString());
-                }
-            });
-            page++;
-        }
-
-        return noticias;
-    }
-
-    @Override
-    public ArrayList<Noticia> getNoticiasRecentes() {
-        Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
-        ArrayList<Noticia> noticias = new ArrayList<>();
-        int page = 1;
-
-        while (page <= MAX_PAGES) {
-            Objects.requireNonNull(getNewsElements(BASE_URL + page)).forEach(item -> {
-                try {
-                    Date date = getNewsDate(item);
-
-                    if (date.after(Date.from(yesterday))) {
-                        noticias.add(getNoticiaFromContent(item, date));
-                    }
-                } catch (Exception e) {
-                    System.out.println("AVISO: " + e.getMessage());
-                }
-            });
-            page++;
         }
 
         return noticias;
@@ -171,10 +78,6 @@ public class BBCParser extends Parser {
         }
 
         throw new Exception("Não foi possível coletar uma notícia da BBC.");
-    }
-
-    private boolean isSearchedUrl(Element item, String search) {
-        return ("https://www.bbc.com/" + item.select("a.qa-heading-link").attr("href")).equalsIgnoreCase(search);
     }
 
     private String getNewsSummary(Element item) {
