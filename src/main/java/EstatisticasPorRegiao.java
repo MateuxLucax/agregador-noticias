@@ -1,6 +1,5 @@
 import enums.Regiao;
 import models.Estatisticas;
-
 import org.jsoup.Jsoup;
 
 import java.text.DecimalFormat;
@@ -12,8 +11,6 @@ public class EstatisticasPorRegiao {
 
     private static final Regiao[] REGIOES    = Regiao.values();
     private static final String   USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
-
-
 
     public EstatisticasPorRegiao() {
         estatisticas = new HashMap<>(REGIOES.length);
@@ -33,9 +30,7 @@ public class EstatisticasPorRegiao {
 
                 Regiao regiao = Regiao.BRASIL;  // valor padrão
                 String valorRegiao = valores[1];
-                if (valorRegiao.equals("TOTAL")) {
-                    regiao = Regiao.BRASIL;
-                } else {
+                if (!valorRegiao.equals("TOTAL")) {
                     for (Regiao r : REGIOES)
                         if (valorRegiao.equals(r.name()))
                             regiao = r;
@@ -58,7 +53,6 @@ public class EstatisticasPorRegiao {
     public Estatisticas getEstatisticas(Regiao r) {
         return estatisticas.get(r);
     }
-
 
     public void printTabela() {
         DecimalFormat df = new DecimalFormat();

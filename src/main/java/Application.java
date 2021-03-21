@@ -50,7 +50,7 @@ public class Application {
                     Date today     = Date.from(now.truncatedTo(ChronoUnit.DAYS));
 
                     System.out.println(jornais[i].getNome());
-                    ArrayList<Noticia> ns = p.getNoticias(yesterday, today);
+                    ArrayList<Noticia> ns = p.getNoticiasRecentes();
                     for (Noticia n : ns)
                         System.out.println(n);
                 }

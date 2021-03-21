@@ -120,8 +120,8 @@ public class FSPParser extends Parser {
                     noticias.add(getNoticiaFromContent(headlineContent, date));
 
                 }
-            } catch (Exception ignored) {
-                System.out.println("AVISO: " + news.toString());
+            } catch (Exception e) {
+                System.out.println("AVISO: " + e.toString());
             }
         };
 

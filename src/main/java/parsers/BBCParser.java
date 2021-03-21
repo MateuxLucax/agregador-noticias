@@ -130,7 +130,7 @@ public class BBCParser extends Parser {
 
                     noticias.add(getNoticiaFromContent(item, date));
                 } catch (Exception e) {
-                    System.out.println("something went wrong while parsing news: " + e.getMessage());
+                    System.out.println("AVISO: " + e.getMessage());
                 }
             });
             page++;

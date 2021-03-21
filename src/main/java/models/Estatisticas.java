@@ -1,9 +1,5 @@
 package models;
 
-import enums.Regiao;
-
-import java.text.DecimalFormat;
-
 public class Estatisticas {
 
     private final long casos;
