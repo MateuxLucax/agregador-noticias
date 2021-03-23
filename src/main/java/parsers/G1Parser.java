@@ -8,6 +8,7 @@ import models.Noticia;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -95,14 +96,26 @@ public class G1Parser extends Parser {
             Noticia noticia = new Noticia();
 
             if (noticia.setUrl(content.get("url").getAsString()) &&
-                    noticia.setResumo(content.get("summary").getAsString()) &&
-                    noticia.setTitulo(content.get("title").getAsString()) &&
-                    noticia.setData(date)
+                noticia.setResumo(getNewsSummary(content)) &&
+                noticia.setTitulo(content.get("title").getAsString()) &&
+                noticia.setData(date)
             ) {
                 return noticia;
             }
         } catch (Exception ignored) { }
 
         throw new Exception("Não foi possível coletar uma notícia do G1.");
+    }
+
+    private String getNewsSummary(JsonObject content) {
+        try {
+            String summary = content.get("summary").getAsString();
+            if (!summary.isEmpty()) {
+                return summary;
+            }
+        } catch (Exception ignored) { }
+
+        return "Não foi possível obter o resumo dessa notícia.";
+
     }
 }
