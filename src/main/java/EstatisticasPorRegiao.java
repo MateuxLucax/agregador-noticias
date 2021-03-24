@@ -65,7 +65,7 @@ public class EstatisticasPorRegiao {
 
         System.out.printf("%8s%13s%13s%13s%13s%13s\n",
                 "Região", "Casos", "Óbitos", "Recuperados", "Vacinados", "Segunda dose");
-        for (Regiao r : REGIOES) {
+        for (Regiao r : estatisticas.keySet()) {
             Estatisticas e = estatisticas.get(r);
             System.out.printf("%8s%13s%13s%13s%13s%13s\n",
                     r.name(),
