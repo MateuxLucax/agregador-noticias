@@ -36,7 +36,7 @@ public class BBCParser extends Parser {
                 try {
                     noticias.add(getNoticiaFromContent(item, getNewsDate(item)));
                 } catch (Exception e) {
-                    System.out.println("AVISO: " + e.toString());
+                    System.out.println("AVISO [BBC]: " + e.toString());
                 }
             });
         }

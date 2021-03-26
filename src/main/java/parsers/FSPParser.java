@@ -33,7 +33,10 @@ public class FSPParser extends Parser {
 
                 noticias.add(getNoticiaFromContent(headlineContent, getNewsDate(headlineContent)));
             } catch (Exception e) {
-                System.out.println("AVISO: " + e.toString());
+                String errorMessage = e.toString();
+                if (hasSubscriberOnlyContent(news)) errorMessage = "Conteúdo apenas para assinantes";
+
+                System.out.println("AVISO [FSP]: " + errorMessage);
             }
         });
 
@@ -76,5 +79,9 @@ public class FSPParser extends Parser {
 
     private boolean hasOutBrain(Element news) {
         return !news.select(".OUTBRAIN").isEmpty();
+    }
+
+    private boolean hasSubscriberOnlyContent(Element news) {
+        return news.text().contains("Recurso exclusivo para assinantes");
     }
 }

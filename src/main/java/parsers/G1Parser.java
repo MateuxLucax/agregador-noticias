@@ -43,7 +43,7 @@ public class G1Parser extends Parser {
 
                     noticias.add(getNoticiaFromContent(getItemContent(item), getPostDate(item)));
                 } catch (Exception e) {
-                    System.out.println("AVISO: " + e.toString());
+                    System.out.println("AVISO [G1]: " + e.toString());
                 }
             });
         }
