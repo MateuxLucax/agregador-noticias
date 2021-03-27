@@ -20,7 +20,6 @@ public class Application {
     private ArrayList<Noticia>    noticiasSalvas;
 
     private JFrame frame;
-    private JTable tabelaEstatisticas;
 
     public Application()
     {
@@ -60,11 +59,8 @@ public class Application {
         contentPane.setLayout(new BorderLayout(6, 6));
         contentPane.setBorder(new EmptyBorder(12, 12, 12, 12));
 
-        criarTabela();
-        // ScrollPane necessário pra mostrar o cabeçalho da tabela
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setViewportView(tabelaEstatisticas);
-        contentPane.add(scrollPane, BorderLayout.CENTER);
+        JTabbedPane tabs = gerarPainelTabs();
+        frame.add(tabs);
 
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -74,7 +70,20 @@ public class Application {
         });
     }
 
-    private void criarTabela()
+    private JTabbedPane gerarPainelTabs()
+    {
+        JTabbedPane tabs = new JTabbedPane();
+
+        // ScrollPane necessário pra mostrar o cabeçalho da tabela
+        JTable tabela = gerarTabelaEstatisticas();
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(tabela);
+        tabs.addTab("Estatísticas", scrollPane);
+
+        return tabs;
+    }
+
+    private JTable gerarTabelaEstatisticas()
     {
         Regiao[] regioes = Regiao.values();
         String[] colunas = {"Região", "Casos", "Óbitos", "Recuperados", "Vacinados", "Segunda dose"};
@@ -94,9 +103,10 @@ public class Application {
             dados[i][j++] = df.format(e.getSegundaDose());
         }
 
-        tabelaEstatisticas = new JTable(dados, colunas);
+        JTable tabela = new JTable(dados, colunas);
         // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
-        tabelaEstatisticas.setDefaultEditor(Object.class, null);
+        tabela.setDefaultEditor(Object.class, null);
+        return tabela;
     }
 
     private void carregaDadosUsuario()
