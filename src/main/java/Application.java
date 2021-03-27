@@ -2,6 +2,9 @@ import enums.Regiao;
 import models.Estatisticas;
 import models.Jornal;
 import models.Noticia;
+import parsers.BBCParser;
+import parsers.FSPParser;
+import parsers.G1Parser;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -9,8 +12,13 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class Application {
 
@@ -47,9 +55,9 @@ public class Application {
     private void criarJornais()
     {
         jornais = new ArrayList<>();
-        // jornais.add(new Jornal("G1", "https://g1.globo.com/", new G1Parser()));
-        // jornais.add(new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()));
-        // jornais.add(new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser()));
+        jornais.add(new Jornal("G1", "https://g1.globo.com/", new G1Parser()));
+        jornais.add(new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()));
+        jornais.add(new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser()));
     }
 
     private void criarFrame()
@@ -78,9 +86,35 @@ public class Application {
         JTable tabela = gerarTabelaEstatisticas();
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(tabela);
+        jornais.forEach(jornal -> {
+            JScrollPane jornalScrollPane = new JScrollPane();
+            jornalScrollPane.setViewportView(this.gerarTabelaNoticias(jornal));
+            tabs.addTab("Notícias - " + jornal.getNome(), jornalScrollPane);
+        });
         tabs.addTab("Estatísticas", scrollPane);
 
         return tabs;
+    }
+
+    private JTable gerarTabelaNoticias(Jornal jornal) {
+        String[] colunas = {"Título", "Data de publicação", "Resumo", "URL"};
+        String[][] dados = new String[jornal.getNoticias().size()][colunas.length];
+
+        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm", new Locale("pt", "br"));
+
+        for (int i = 0; i < jornal.getNoticias().size(); i++)
+        {
+            int j = 0;
+            dados[i][j++] = jornal.getNoticias().get(i).getTitulo();
+            dados[i][j++] = dateFormat.format(jornal.getNoticias().get(i).getData());
+            dados[i][j++] = jornal.getNoticias().get(i).getResumo();
+            dados[i][j++] = jornal.getNoticias().get(i).getUrl();
+        }
+
+        JTable tabela = new JTable(dados, colunas);
+        // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
+        tabela.setDefaultEditor(Object.class, null);
+        return tabela;
     }
 
     private JTable gerarTabelaEstatisticas()

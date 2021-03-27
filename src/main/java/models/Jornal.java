@@ -14,9 +14,16 @@ public class Jornal {
 
     private final String             nome;
     private final String             url;
-    private final Parser             parser;
+    private       Parser             parser;
     private       boolean            seguido;
     private final ArrayList<Noticia> noticias;
+
+    public Jornal(String nome, String url) {
+        this.nome     = nome;
+        this.url      = url;
+        this.seguido  = true;
+        this.noticias = new ArrayList<>();
+    }
 
     public Jornal(String nome, String url, Parser parser) {
         this.nome     = nome;
@@ -36,6 +43,12 @@ public class Jornal {
 
     public ArrayList<Noticia> getNoticias() {
         return noticias;
+    }
+
+    public boolean addNoticia(Noticia noticia) {
+        if (this.noticias.contains(noticia)) return false;
+        this.noticias.add(noticia);
+        return true;
     }
 
     private ArrayList<Noticia> filtrarNoticias(Predicate<Noticia> predicate) {
