@@ -5,6 +5,7 @@ import models.Noticia;
 import parsers.BBCParser;
 import parsers.FSPParser;
 import parsers.G1Parser;
+import gui.NoticiaPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -56,7 +57,7 @@ public class Application {
     {
         jornais = new ArrayList<>();
         jornais.add(new Jornal("G1", "https://g1.globo.com/", new G1Parser()));
-        jornais.add(new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()));
+        // jornais.add(new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()));
         jornais.add(new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser()));
     }
 
@@ -82,21 +83,48 @@ public class Application {
     {
         JTabbedPane tabs = new JTabbedPane();
 
-        // ScrollPane necessário pra mostrar o cabeçalho da tabela
         JTable tabela = gerarTabelaEstatisticas();
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(tabela);
-        jornais.forEach(jornal -> {
+        tabs.addTab("Estatísticas", scrollPane);
+
+        /* jornais.forEach(jornal -> {
             JScrollPane jornalScrollPane = new JScrollPane();
             jornalScrollPane.setViewportView(this.gerarTabelaNoticias(jornal));
             tabs.addTab("Notícias - " + jornal.getNome(), jornalScrollPane);
-        });
-        tabs.addTab("Estatísticas", scrollPane);
+        }); */
+
+        JPanel painelNoticias = gerarPainelNoticias();
+        scrollPane = new JScrollPane();
+        scrollPane.setViewportView(painelNoticias);
+        tabs.addTab("Notícias", scrollPane);
 
         return tabs;
     }
 
-    private JTable gerarTabelaNoticias(Jornal jornal) {
+    private JPanel gerarPainelNoticias()
+    {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        for (Jornal j : jornais)
+        {
+            if (!j.seguido())
+                continue;
+
+            for (Noticia n : j.getNoticias())
+            {
+                // TODO salvar notícia para ler mais tarde
+                NoticiaPanel np = new NoticiaPanel(n, j);
+                painel.add(np);
+            }
+        }
+
+        return painel;
+    }
+
+    /* private JTable gerarTabelaNoticias(Jornal jornal)
+    {
         String[] colunas = {"Título", "Data de publicação", "Resumo", "URL"};
         String[][] dados = new String[jornal.getNoticias().size()][colunas.length];
 
@@ -115,7 +143,7 @@ public class Application {
         // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
         tabela.setDefaultEditor(Object.class, null);
         return tabela;
-    }
+    }*/
 
     private JTable gerarTabelaEstatisticas()
     {
