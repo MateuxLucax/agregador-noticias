@@ -22,6 +22,11 @@ public class NoticiaPanel extends JPanel
     private final Noticia noticia;
     private final Jornal jornal;
 
+    public NoticiaPanel(Noticia noticia)
+    {
+        this(noticia, null);
+    }
+
     public NoticiaPanel(Noticia noticia, Jornal jornal)
     {
         this.noticia = noticia;
@@ -77,10 +82,13 @@ public class NoticiaPanel extends JPanel
             lbData.setForeground(Color.GRAY);
         meioPanel.add(lbData);
 
-        String jornalUnderline = String.format("<html><u>%s</u></html>", jornal.getNome());
+        if (jornal != null)
+        {
+            String jornalUnderline = String.format("<html><u>%s</u></html>", jornal.getNome());
             JLabel jornalLabel = new JLabel(jornalUnderline);
             makeLink(jornalLabel, jornal.getUrl());
-        meioPanel.add(jornalLabel);
+            meioPanel.add(jornalLabel);
+        }
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

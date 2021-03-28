@@ -79,14 +79,17 @@ public class Application {
         });
     }
 
+    // função helper para gerarPainelTabs
+    private void addTabComScrollPane(JTabbedPane tabs, String titulo, JComponent comp)
+    {
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(comp);
+        tabs.add(titulo, scrollPane);
+    }
+
     private JTabbedPane gerarPainelTabs()
     {
         JTabbedPane tabs = new JTabbedPane();
-
-        JTable tabela = gerarTabelaEstatisticas();
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setViewportView(tabela);
-        tabs.addTab("Estatísticas", scrollPane);
 
         /* jornais.forEach(jornal -> {
             JScrollPane jornalScrollPane = new JScrollPane();
@@ -94,10 +97,9 @@ public class Application {
             tabs.addTab("Notícias - " + jornal.getNome(), jornalScrollPane);
         }); */
 
-        JPanel painelNoticias = gerarPainelNoticias();
-        scrollPane = new JScrollPane();
-        scrollPane.setViewportView(painelNoticias);
-        tabs.addTab("Notícias", scrollPane);
+        addTabComScrollPane(tabs, "Estatísticas", gerarTabelaEstatisticas());
+        addTabComScrollPane(tabs, "Notícias", gerarPainelNoticias());
+        addTabComScrollPane(tabs, "Ler mais tarde", gerarPainelLerMaisTarde());
 
         return tabs;
     }
@@ -118,6 +120,20 @@ public class Application {
                 NoticiaPanel np = new NoticiaPanel(n, j);
                 painel.add(np);
             }
+        }
+
+        return painel;
+    }
+
+    private JPanel gerarPainelLerMaisTarde()
+    {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        for (Noticia n : noticiasSalvas)
+        {
+            NoticiaPanel np = new NoticiaPanel(n);
+            painel.add(np);
         }
 
         return painel;
