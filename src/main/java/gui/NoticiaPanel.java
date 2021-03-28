@@ -2,6 +2,7 @@ package gui;
 
 import models.Jornal;
 import models.Noticia;
+import utils.BrowserUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -12,6 +13,9 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class NoticiaPanel extends JPanel
 {
@@ -31,13 +35,8 @@ public class NoticiaPanel extends JPanel
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         label.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent evt) {
-                try {
-                    Desktop.getDesktop().browse(new URI(url));
-                    label.setForeground(Color.MAGENTA.darker().darker());
-                } catch (IOException | URISyntaxException e) {
-                    System.out.println("Link do jornal inválido");
-                    // TODO mostrar alguma mensagem de erro em modal
-                }
+                BrowserUtil.openUrl(url);
+                label.setForeground(Color.MAGENTA.darker().darker());
             }
         });
         return label;
@@ -73,8 +72,8 @@ public class NoticiaPanel extends JPanel
         JPanel meioPanel = new JPanel();
         meioPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        // TODO mostrar a data em formato tipo "20 de Março de 2012"
-        JLabel lbData = new JLabel(noticia.getData().toString());
+        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm", new Locale("pt", "br"));
+        JLabel lbData = new JLabel(dateFormat.format(noticia.getData()));
             lbData.setForeground(Color.GRAY);
         meioPanel.add(lbData);
 
