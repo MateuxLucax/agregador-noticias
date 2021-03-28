@@ -85,6 +85,11 @@ public class Application {
         });
     }
 
+
+    //
+    // Criação das tabs
+    //
+
     // função helper para gerarPainelTabs
     private void addTabComScrollPane(JTabbedPane tabs, String titulo, JComponent comp)
     {
@@ -97,12 +102,6 @@ public class Application {
     {
         JTabbedPane tabs = new JTabbedPane();
 
-        /* jornais.forEach(jornal -> {
-            JScrollPane jornalScrollPane = new JScrollPane();
-            jornalScrollPane.setViewportView(this.gerarTabelaNoticias(jornal));
-            tabs.addTab("Notícias - " + jornal.getNome(), jornalScrollPane);
-        }); */
-
         addTabComScrollPane(tabs, "Estatísticas", gerarTabelaEstatisticas());
         painelLerMaisTarde = gerarPainelLerMaisTarde();
         addTabComScrollPane(tabs, "Ler mais tarde", painelLerMaisTarde);
@@ -110,6 +109,7 @@ public class Application {
         // o painel das notícias atualiza o painelLerMaisTarde quando o usuário
         // clica em ler uma notícia mais tarde
         addTabComScrollPane(tabs, "Notícias", gerarPainelNoticias());
+        addTabComScrollPane(tabs, "Jornais seguidos", gerarPainelJornaisSeguidos());
 
         return tabs;
     }
@@ -122,7 +122,7 @@ public class Application {
 
         for (Jornal j : jornais)
         {
-            if (!j.seguido())
+            if (!j.isSeguido())
                 continue;
 
             for (Noticia n : j.getNoticias())
@@ -178,28 +178,6 @@ public class Application {
         return painel;
     }
 
-    /* private JTable gerarTabelaNoticias(Jornal jornal)
-    {
-        String[] colunas = {"Título", "Data de publicação", "Resumo", "URL"};
-        String[][] dados = new String[jornal.getNoticias().size()][colunas.length];
-
-        DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm", new Locale("pt", "br"));
-
-        for (int i = 0; i < jornal.getNoticias().size(); i++)
-        {
-            int j = 0;
-            dados[i][j++] = jornal.getNoticias().get(i).getTitulo();
-            dados[i][j++] = dateFormat.format(jornal.getNoticias().get(i).getData());
-            dados[i][j++] = jornal.getNoticias().get(i).getResumo();
-            dados[i][j++] = jornal.getNoticias().get(i).getUrl();
-        }
-
-        JTable tabela = new JTable(dados, colunas);
-        // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
-        tabela.setDefaultEditor(Object.class, null);
-        return tabela;
-    }*/
-
     private JTable gerarTabelaEstatisticas()
     {
         Regiao[] regioes = Regiao.values();
@@ -226,9 +204,36 @@ public class Application {
         return tabela;
     }
 
+    private JPanel gerarPainelJornaisSeguidos()
+    {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        int n = jornais.size();
+        JCheckBox[] cbs = new JCheckBox[n];
+        for (int i = 0; i < n; i++)
+        {
+            Jornal j = jornais.get(i);
+            cbs[i] = new JCheckBox(j.getNome(), j.isSeguido());
+            painel.add(cbs[i]);
+        }
+
+        JButton btSalvar = new JButton("Salvar preferências");
+        btSalvar.addActionListener(e -> {
+            for (int i = 0; i < n; i++)
+                jornais.get(i).setSeguido(cbs[i].isSelected());
+        });
+        painel.add(btSalvar);
+
+        return painel;
+    }
+
+    //
+    // Carregar e salvar dados do usuário
+    //
+
     private void carregaDadosUsuario()
     {
-        System.out.println("Carregando dados do usuário");
         try {
             noticiasSalvas = dadosUsuario.loadNoticias();
             dadosUsuario.loadJornaisSeguidos(jornais);
@@ -239,7 +244,6 @@ public class Application {
 
     private void salvarDadosUsuario()
     {
-        System.out.println("Salvando dados do usuário");
         try {
             dadosUsuario.saveJornaisSeguidos(jornais);
             dadosUsuario.saveNoticias(noticiasSalvas);
@@ -296,3 +300,24 @@ public class Application {
     }
 }
 
+/* private JTable gerarTabelaNoticias(Jornal jornal)
+{
+    String[] colunas = {"Título", "Data de publicação", "Resumo", "URL"};
+    String[][] dados = new String[jornal.getNoticias().size()][colunas.length];
+
+    DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm", new Locale("pt", "br"));
+
+    for (int i = 0; i < jornal.getNoticias().size(); i++)
+    {
+        int j = 0;
+        dados[i][j++] = jornal.getNoticias().get(i).getTitulo();
+        dados[i][j++] = dateFormat.format(jornal.getNoticias().get(i).getData());
+        dados[i][j++] = jornal.getNoticias().get(i).getResumo();
+        dados[i][j++] = jornal.getNoticias().get(i).getUrl();
+    }
+
+    JTable tabela = new JTable(dados, colunas);
+    // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
+    tabela.setDefaultEditor(Object.class, null);
+    return tabela;
+}*/

@@ -34,12 +34,11 @@ public class Jornal {
         noticias.addAll(parser.getNoticias());
     }
 
-    public void seguir()    { seguido = true; }
-    public void naoSeguir() { seguido = false; }
+    public void setSeguido(boolean seguido) { this.seguido = seguido; }
 
     public String  getNome()   { return nome; }
     public String  getUrl()    { return url; }
-    public boolean seguido()   { return seguido; }
+    public boolean isSeguido() { return seguido; }
 
     public ArrayList<Noticia> getNoticias() {
         return noticias;

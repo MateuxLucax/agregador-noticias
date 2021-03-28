@@ -51,13 +51,12 @@ public class DadosUsuario {
         int i;
         for (i=0; scn.hasNext() && i < n; i++) {
             boolean seguir = Boolean.parseBoolean( scn.next() );
-            if (seguir) jornais.get(i).seguir();
-            else        jornais.get(i).naoSeguir();
+            jornais.get(i).setSeguido(seguir);
         }
 
         // Seguir resto dos jornais por padrão
         for (; i < n; i++)
-            jornais.get(i).seguir();
+            jornais.get(i).setSeguido(true);
         scn.close();
     }
 
@@ -68,8 +67,8 @@ public class DadosUsuario {
 
         if (n > 0) {
             for (int i = 0; i < n - 1; i++)
-                fmt.format("%b;", jornais.get(i).seguido());
-            fmt.format("%b", jornais.get(n - 1).seguido());
+                fmt.format("%b;", jornais.get(i).isSeguido());
+            fmt.format("%b", jornais.get(n - 1).isSeguido());
         }
 
         fmt.close();
