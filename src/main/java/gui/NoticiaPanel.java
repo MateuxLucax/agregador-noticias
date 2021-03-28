@@ -21,6 +21,11 @@ public class NoticiaPanel extends JPanel
 {
     private final Noticia noticia;
     private final Jornal jornal;
+
+    // Botão ou é "ler mais tarde" ou "remover" (da lista de ler mais tarde).
+    // Ele vem de fora porque seu actionListener tem que alterar
+    // o estado de fora esse objeto NoticiaPanel (dar repaint no painel de notícias,
+    // adicionar ou remover a notícia ao noticiasSalvas em Application).
     private final JButton botao;
 
     public NoticiaPanel(Noticia noticia, JButton botao)
