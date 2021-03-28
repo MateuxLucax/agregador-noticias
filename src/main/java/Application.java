@@ -28,6 +28,12 @@ public class Application {
     private DadosUsuario          dadosUsuario;
     private ArrayList<Noticia>    noticiasSalvas;
 
+    // painelLerMaisTarde deve estar disponível globalmente
+    // porque o usuário adiciona notícias para ler mais tarde no
+    // painel de notícias, e queremos que o painelLerMaisTarde
+    // seja atualizado quando isso é feito -- para tanto,
+    // deve estar disponível em gerarPainelNoticias()
+    private JPanel painelLerMaisTarde;
     private JFrame frame;
 
     public Application()
@@ -98,8 +104,12 @@ public class Application {
         }); */
 
         addTabComScrollPane(tabs, "Estatísticas", gerarTabelaEstatisticas());
+        painelLerMaisTarde = gerarPainelLerMaisTarde();
+        addTabComScrollPane(tabs, "Ler mais tarde", painelLerMaisTarde);
+        // painelLerMaisTarde deve ser gerado ANTES do painel das notícias porque
+        // o painel das notícias atualiza o painelLerMaisTarde quando o usuário
+        // clica em ler uma notícia mais tarde
         addTabComScrollPane(tabs, "Notícias", gerarPainelNoticias());
-        addTabComScrollPane(tabs, "Ler mais tarde", gerarPainelLerMaisTarde());
 
         return tabs;
     }
@@ -109,6 +119,7 @@ public class Application {
         JPanel painel = new JPanel();
         painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
 
+
         for (Jornal j : jornais)
         {
             if (!j.seguido())
@@ -116,8 +127,30 @@ public class Application {
 
             for (Noticia n : j.getNoticias())
             {
-                // TODO salvar notícia para ler mais tarde
-                NoticiaPanel np = new NoticiaPanel(n, j);
+                // Ao adicionar um jornal para ler mais tarde,
+                // precisamos atualizar o painelLerMaisTarde.
+                // Mas não basta adicionar o NoticiaPanel np no painel de ler mais tarde,
+                // pois o botão também deve trocar (de ter botão "Remover").
+                // Para tanto, criamos um outro NoticiaPanel com esse botão,
+                // e adicionamos ele no painelLerMaisTarde.
+
+                JButton btn = new JButton("Ler mais tarde");
+                JButton btnRemover = new JButton("Remover");
+
+                NoticiaPanel np = new NoticiaPanel(n, j, btn);
+                NoticiaPanel npLerMaisTarde = new NoticiaPanel(n, j, btnRemover);
+
+                btn.addActionListener(e -> {
+                    lerMaisTarde(n);
+                    painelLerMaisTarde.add(npLerMaisTarde);
+                    painelLerMaisTarde.repaint();
+                });
+                btnRemover.addActionListener(e -> {
+                    removerLerMaisTarde(n);
+                    painelLerMaisTarde.remove(npLerMaisTarde);
+                    painelLerMaisTarde.repaint();
+                });
+
                 painel.add(np);
             }
         }
@@ -132,7 +165,13 @@ public class Application {
 
         for (Noticia n : noticiasSalvas)
         {
-            NoticiaPanel np = new NoticiaPanel(n);
+            JButton btn = new JButton("Remover");
+            NoticiaPanel np = new NoticiaPanel(n, btn);
+            btn.addActionListener(e ->  {
+                removerLerMaisTarde(n);
+                painel.remove(np);
+                painel.repaint();
+            });
             painel.add(np);
         }
 

@@ -21,16 +21,18 @@ public class NoticiaPanel extends JPanel
 {
     private final Noticia noticia;
     private final Jornal jornal;
+    private final JButton botao;
 
-    public NoticiaPanel(Noticia noticia)
+    public NoticiaPanel(Noticia noticia, JButton botao)
     {
-        this(noticia, null);
+        this(noticia, null, botao);
     }
 
-    public NoticiaPanel(Noticia noticia, Jornal jornal)
+    public NoticiaPanel(Noticia noticia, Jornal jornal, JButton botao)
     {
         this.noticia = noticia;
         this.jornal  = jornal;
+        this.botao   = botao;
         init();
     }
 
@@ -89,6 +91,8 @@ public class NoticiaPanel extends JPanel
             makeLink(jornalLabel, jornal.getUrl());
             meioPanel.add(jornalLabel);
         }
+
+        meioPanel.add(botao);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
