@@ -29,10 +29,10 @@ public class Application {
     private ArrayList<Noticia>    noticiasSalvas;
 
     // painelLerMaisTarde deve estar disponível globalmente
-    // porque o usuário adiciona notícias para ler mais tarde no
-    // painel de notícias, e queremos que o painelLerMaisTarde
-    // seja atualizado quando isso é feito -- para tanto,
-    // deve estar disponível em gerarPainelNoticias()
+    // para poder ser atualizado, no painel de notícias
+    // quando uma notícia é salva para ler mais tarde.
+    // Isto é, para que possa ser atualizado, o painel deve estar
+    // disponível no escopo de gerarPainelNoticias().
     private JPanel painelLerMaisTarde;
     private JFrame frame;
 
@@ -195,7 +195,7 @@ public class Application {
             dados[i][j++] = df.format(e.getObitos());
             dados[i][j++] = df.format(e.getRecuperados());
             dados[i][j++] = df.format(e.getVacinados());
-            dados[i][j++] = df.format(e.getSegundaDose());
+            dados[i][j  ] = df.format(e.getSegundaDose());
         }
 
         JTable tabela = new JTable(dados, colunas);
