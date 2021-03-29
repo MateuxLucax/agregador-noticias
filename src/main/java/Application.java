@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.Flow;
 
 public class Application {
 
@@ -64,7 +65,7 @@ public class Application {
         jornais = new ArrayList<>();
         jornais.add(new Jornal("G1", "https://g1.globo.com/", new G1Parser()));
         // jornais.add(new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()));
-        jornais.add(new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser()));
+        // jornais.add(new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser()));
     }
 
     private void criarFrame()
@@ -119,6 +120,9 @@ public class Application {
         JPanel painel = new JPanel();
         painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
 
+        JPanel painelNoticias = new JPanel();
+        painel.add(gerarPainelPesquisa(painelNoticias));
+        painelNoticias.setLayout(new BoxLayout(painelNoticias, BoxLayout.Y_AXIS));
 
         for (Jornal j : jornais)
         {
@@ -151,12 +155,48 @@ public class Application {
                     painelLerMaisTarde.repaint();
                 });
 
-                painel.add(np);
+                painelNoticias.add(np);
             }
         }
 
+        painel.add(painelNoticias);
+
         return painel;
     }
+
+    // painelNoticias é passado para que os botões de pesquisam possam
+    // atualizá-lo e mostrar as notícias resultantes da pesquisa
+    private JTabbedPane gerarPainelPesquisa(JPanel painelNoticias)
+    {
+        JTabbedPane tabs = new JTabbedPane();
+
+        JPanel painelTitulo = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        JLabel label = new JLabel("Título: ");
+        JTextField pesquisa = new JTextField(20);
+        painelTitulo.add(label);
+        painelTitulo.add(pesquisa);
+
+        ArrayList<Noticia> noticias = new ArrayList<>();
+        for (Jornal j : jornais)
+            for (Noticia n : j.getNoticias(pesquisa.getText()))
+                noticias.add(n);
+
+        JButton btPesquisar = new JButton("Pesquisar");
+        btPesquisar.addActionListener(e -> atualizarPainelNoticias(painelNoticias, noticias));
+
+        painelTitulo.add(btPesquisar);
+
+        tabs.add("Por título", painelTitulo);
+
+        return tabs;
+    }
+
+    private void atualizarPainelNoticias(JPanel painelNoticias, String pesquisa)
+    {
+
+    }
+
 
     private JPanel gerarPainelLerMaisTarde()
     {
