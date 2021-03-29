@@ -35,7 +35,7 @@ public class Application {
         estatisticas = EstatisticasPorRegiao.getInstance();
         dadosUsuario = DadosUsuario.getInstance();
         criarJornais();
-        carregaDadosUsuario();
+        carregarDadosUsuario();
 
         criarFrame();
         frame.pack();
@@ -345,7 +345,7 @@ public class Application {
     // Carregar e salvar dados do usuário
     //
 
-    private void carregaDadosUsuario()
+    private void carregarDadosUsuario()
     {
         try {
             noticiasSalvas = dadosUsuario.loadNoticias();

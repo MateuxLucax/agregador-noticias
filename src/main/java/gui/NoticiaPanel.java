@@ -10,9 +10,6 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -41,7 +38,7 @@ public class NoticiaPanel extends JPanel
         init();
     }
 
-    private JLabel makeLink(JLabel label, String url)
+    private JLabel tornarLink(JLabel label, String url)
     {
         label.setForeground(Color.BLUE);
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -63,6 +60,8 @@ public class NoticiaPanel extends JPanel
     }
 
 
+    // Método separado do construtor porque o BoxLayout precisa receber 'this',
+    // e dentro do construtor this ainda não existe
     public void init()
     {
         setBorder(new EtchedBorder());
@@ -75,7 +74,7 @@ public class NoticiaPanel extends JPanel
                 abreviarString(noticia.getTitulo(), 120)
         );
         JLabel tituloLabel = new JLabel(tituloUnderline);
-            makeLink(tituloLabel, noticia.getUrl());
+            tornarLink(tituloLabel, noticia.getUrl());
             /* Font fnt = tituloLabel.getFont();
             Font newFnt = new Font(fnt.getFontName(), Font.BOLD, fnt.getSize() + 2);
             tituloLabel.setFont(newFnt); */
@@ -93,7 +92,7 @@ public class NoticiaPanel extends JPanel
         {
             String jornalUnderline = String.format("<html><u>%s</u></html>", jornal.getNome());
             JLabel jornalLabel = new JLabel(jornalUnderline);
-            makeLink(jornalLabel, jornal.getUrl());
+            tornarLink(jornalLabel, jornal.getUrl());
             meioPanel.add(jornalLabel);
         }
 
