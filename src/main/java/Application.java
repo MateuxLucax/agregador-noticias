@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Application {
 
@@ -81,6 +82,132 @@ public class Application {
 
     //
     // Criação das tabs
+    //
+
+    private JPanel gerarPainelLerMaisTarde()
+    {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        //
+        // Painel de cadastro de notícias de outros jornais que o usuário quiser salvar
+        //
+        JPanel cadastro = new JPanel();
+        cadastro.setLayout(new BoxLayout(cadastro, BoxLayout.Y_AXIS));
+        JPanel linha;
+        JLabel label;
+
+        linha = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        label = new JLabel("Título: ");
+        label.setPreferredSize(new Dimension(120, 20));
+        linha.add(label);
+        JTextField tfTitulo = new JTextField(30);
+        linha.add(tfTitulo);
+        cadastro.add(linha);
+
+        // TODO adicionar data (dd/mm/aaaa) da notícia
+
+        linha = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        label = new JLabel("URL: ");
+        label.setPreferredSize(new Dimension(120, 20));
+        linha.add(label);
+        JTextField tfUrl = new JTextField(30);
+        linha.add(tfUrl);
+        cadastro.add(linha);
+
+        linha = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        label = new JLabel("Resumo: ");
+        label.setPreferredSize(new Dimension(120, 20));
+        linha.add(label);
+        JTextField tfResumo = new JTextField(30);
+        linha.add(tfResumo);
+        cadastro.add(linha);
+
+        linha = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton btnCadastrar = new JButton("Cadastrar");
+        btnCadastrar.addActionListener(e -> {
+            Noticia n = new Noticia(tfTitulo.getText(), new Date(), tfUrl.getText(), tfResumo.getText());
+            painel.add( gerarNoticiaPanelDoPainelLerMaisTarde(painel, n) );
+            painel.revalidate();
+        });
+        linha.add(btnCadastrar);
+        cadastro.add(linha);
+
+        painel.add(cadastro);
+
+        //
+        // Mostrar notícias já salvas
+        //
+        for (Noticia n : noticiasSalvas)
+            painel.add( gerarNoticiaPanelDoPainelLerMaisTarde(painel, n) );
+
+        return painel;
+    }
+
+    private NoticiaPanel gerarNoticiaPanelDoPainelLerMaisTarde(JPanel painel, Noticia noticia)
+    {
+        JButton btn = new JButton("Remover");
+        NoticiaPanel np = new NoticiaPanel(noticia, btn);
+        btn.addActionListener(e ->  {
+            removerLerMaisTarde(noticia);
+            painel.remove(np);
+            painel.revalidate();
+        });
+        return np;
+    }
+
+    private JTable gerarTabelaEstatisticas()
+    {
+        Regiao[] regioes = Regiao.values();
+        String[] colunas = {"Região", "Casos", "Óbitos", "Recuperados", "Vacinados", "Segunda dose"};
+        String[][] dados = new String[regioes.length][colunas.length];
+        DecimalFormat df = new DecimalFormat();
+        df.setGroupingSize(3);
+
+        for (int i = 0; i < regioes.length; i++)
+        {
+            int j = 0;
+            Estatisticas e = estatisticas.getEstatisticas(regioes[i]);
+            dados[i][j++] = regioes[i].name();
+            dados[i][j++] = df.format(e.getCasos());
+            dados[i][j++] = df.format(e.getObitos());
+            dados[i][j++] = df.format(e.getRecuperados());
+            dados[i][j++] = df.format(e.getVacinados());
+            dados[i][j  ] = df.format(e.getSegundaDose());
+        }
+
+        JTable tabela = new JTable(dados, colunas);
+        // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
+        tabela.setDefaultEditor(Object.class, null);
+        return tabela;
+    }
+
+    private JPanel gerarPainelJornaisSeguidos()
+    {
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+
+        int n = jornais.size();
+        JCheckBox[] cbs = new JCheckBox[n];
+        for (int i = 0; i < n; i++)
+        {
+            Jornal j = jornais.get(i);
+            cbs[i] = new JCheckBox(j.getNome(), j.isSeguido());
+            painel.add(cbs[i]);
+        }
+
+        JButton btSalvar = new JButton("Salvar preferências");
+        btSalvar.addActionListener(e -> {
+            for (int i = 0; i < n; i++)
+                jornais.get(i).setSeguido(cbs[i].isSelected());
+        });
+        painel.add(btSalvar);
+
+        return painel;
+    }
+
+    //
+    // Criação de tabs >> painel de notícias e pesquisa
     //
 
     // função helper para gerarPainelTabs
@@ -175,7 +302,7 @@ public class Application {
         for (Jornal j : jornais) {
             if (j.isSeguido())
                 for (Noticia n : j.getNoticias())
-                    painelNoticias.add(gerarNoticiaPanel(n, j));
+                    painelNoticias.add(gerarNoticiaPanelDoPainelNoticias(n, j));
         }
         painelNoticias.revalidate();
     }
@@ -186,12 +313,12 @@ public class Application {
         for (Jornal j : jornais) {
             if (j.isSeguido())
                 for (Noticia n : j.getNoticias(titulo))
-                    painelNoticias.add(gerarNoticiaPanel(n, j));
+                    painelNoticias.add(gerarNoticiaPanelDoPainelNoticias(n, j));
         }
         painelNoticias.revalidate();
     }
 
-    private NoticiaPanel gerarNoticiaPanel(Noticia noticia, Jornal jornal)
+    private NoticiaPanel gerarNoticiaPanelDoPainelNoticias(Noticia noticia, Jornal jornal)
     {
         // Ao adicionar um jornal para ler mais tarde,
         // precisamos atualizar o painelLerMaisTarde.
@@ -200,95 +327,19 @@ public class Application {
         // Para tanto, criamos um outro NoticiaPanel com esse botão,
         // e adicionamos ele no painelLerMaisTarde.
 
+        NoticiaPanel npLerMaisTarde = gerarNoticiaPanelDoPainelLerMaisTarde(painelLerMaisTarde, noticia);
+
         JButton btn = new JButton("Ler mais tarde");
-        JButton btnRemover = new JButton("Remover");
-
         NoticiaPanel np = new NoticiaPanel(noticia, jornal, btn);
-        NoticiaPanel npLerMaisTarde = new NoticiaPanel(noticia, jornal, btnRemover);
-
         btn.addActionListener(e -> {
             lerMaisTarde(noticia);
             painelLerMaisTarde.add(npLerMaisTarde);
-            painelLerMaisTarde.repaint();
-        });
-        btnRemover.addActionListener(e -> {
-            removerLerMaisTarde(noticia);
-            painelLerMaisTarde.remove(npLerMaisTarde);
-            painelLerMaisTarde.repaint();
+            painelLerMaisTarde.revalidate();
         });
 
         return np;
     }
 
-    private JPanel gerarPainelLerMaisTarde()
-    {
-        JPanel painel = new JPanel();
-        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
-
-        for (Noticia n : noticiasSalvas)
-        {
-            JButton btn = new JButton("Remover");
-            NoticiaPanel np = new NoticiaPanel(n, btn);
-            btn.addActionListener(e ->  {
-                removerLerMaisTarde(n);
-                painel.remove(np);
-                painel.repaint();
-            });
-            painel.add(np);
-        }
-
-        return painel;
-    }
-
-    private JTable gerarTabelaEstatisticas()
-    {
-        Regiao[] regioes = Regiao.values();
-        String[] colunas = {"Região", "Casos", "Óbitos", "Recuperados", "Vacinados", "Segunda dose"};
-        String[][] dados = new String[regioes.length][colunas.length];
-        DecimalFormat df = new DecimalFormat();
-        df.setGroupingSize(3);
-
-        for (int i = 0; i < regioes.length; i++)
-        {
-            int j = 0;
-            Estatisticas e = estatisticas.getEstatisticas(regioes[i]);
-            dados[i][j++] = regioes[i].name();
-            dados[i][j++] = df.format(e.getCasos());
-            dados[i][j++] = df.format(e.getObitos());
-            dados[i][j++] = df.format(e.getRecuperados());
-            dados[i][j++] = df.format(e.getVacinados());
-            dados[i][j  ] = df.format(e.getSegundaDose());
-        }
-
-        JTable tabela = new JTable(dados, colunas);
-        // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
-        tabela.setDefaultEditor(Object.class, null);
-        return tabela;
-    }
-
-    private JPanel gerarPainelJornaisSeguidos()
-    {
-        JPanel painel = new JPanel();
-        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
-
-        int n = jornais.size();
-        JCheckBox[] cbs = new JCheckBox[n];
-        for (int i = 0; i < n; i++)
-        {
-            Jornal j = jornais.get(i);
-            cbs[i] = new JCheckBox(j.getNome(), j.isSeguido());
-            painel.add(cbs[i]);
-        }
-
-        JButton btSalvar = new JButton("Salvar preferências");
-        btSalvar.addActionListener(e -> {
-            for (int i = 0; i < n; i++)
-                jornais.get(i).setSeguido(cbs[i].isSelected());
-        });
-        painel.add(btSalvar);
-
-        return painel;
-    }
 
     //
     // Carregar e salvar dados do usuário
