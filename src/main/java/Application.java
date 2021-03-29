@@ -2,8 +2,6 @@ import enums.Regiao;
 import models.Estatisticas;
 import models.Jornal;
 import models.Noticia;
-import parsers.BBCParser;
-import parsers.FSPParser;
 import parsers.G1Parser;
 import gui.NoticiaPanel;
 
@@ -13,14 +11,8 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import java.util.concurrent.Flow;
 
 public class Application {
 
@@ -124,40 +116,7 @@ public class Application {
         painel.add(gerarPainelPesquisa(painelNoticias));
         painelNoticias.setLayout(new BoxLayout(painelNoticias, BoxLayout.Y_AXIS));
 
-        for (Jornal j : jornais)
-        {
-            if (!j.isSeguido())
-                continue;
-
-            for (Noticia n : j.getNoticias())
-            {
-                // Ao adicionar um jornal para ler mais tarde,
-                // precisamos atualizar o painelLerMaisTarde.
-                // Mas não basta adicionar o NoticiaPanel np no painel de ler mais tarde,
-                // pois o botão também deve trocar (de ter botão "Remover").
-                // Para tanto, criamos um outro NoticiaPanel com esse botão,
-                // e adicionamos ele no painelLerMaisTarde.
-
-                JButton btn = new JButton("Ler mais tarde");
-                JButton btnRemover = new JButton("Remover");
-
-                NoticiaPanel np = new NoticiaPanel(n, j, btn);
-                NoticiaPanel npLerMaisTarde = new NoticiaPanel(n, j, btnRemover);
-
-                btn.addActionListener(e -> {
-                    lerMaisTarde(n);
-                    painelLerMaisTarde.add(npLerMaisTarde);
-                    painelLerMaisTarde.repaint();
-                });
-                btnRemover.addActionListener(e -> {
-                    removerLerMaisTarde(n);
-                    painelLerMaisTarde.remove(npLerMaisTarde);
-                    painelLerMaisTarde.repaint();
-                });
-
-                painelNoticias.add(np);
-            }
-        }
+        preencherPainelNoticias(painelNoticias);
 
         painel.add(painelNoticias);
 
@@ -170,6 +129,10 @@ public class Application {
     {
         JTabbedPane tabs = new JTabbedPane();
 
+        //
+        // Pesquisa por título
+        //
+
         JPanel painelTitulo = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         JLabel label = new JLabel("Título: ");
@@ -177,26 +140,85 @@ public class Application {
         painelTitulo.add(label);
         painelTitulo.add(pesquisa);
 
-        ArrayList<Noticia> noticias = new ArrayList<>();
-        for (Jornal j : jornais)
-            for (Noticia n : j.getNoticias(pesquisa.getText()))
-                noticias.add(n);
-
         JButton btPesquisar = new JButton("Pesquisar");
-        btPesquisar.addActionListener(e -> atualizarPainelNoticias(painelNoticias, noticias));
+        btPesquisar.addActionListener(e -> {
+            preencherPainelNoticias(painelNoticias, pesquisa.getText());
+            painelNoticias.repaint();
+        });
 
         painelTitulo.add(btPesquisar);
 
         tabs.add("Por título", painelTitulo);
 
+        //
+        // Pesquisa por uma data
+        //
+
+        JPanel painelData = new JPanel();
+        //...
+        tabs.add("Por data", painelData);
+
+        //
+        // Pesquisa por intervalo de datas
+        //
+
+        JPanel painelIntervalo = new JPanel();
+        //...
+        tabs.add("Por intervalo de datas", painelIntervalo);
+
         return tabs;
     }
 
-    private void atualizarPainelNoticias(JPanel painelNoticias, String pesquisa)
+    private void preencherPainelNoticias(JPanel painelNoticias)
     {
-
+        painelNoticias.removeAll();
+        for (Jornal j : jornais) {
+            if (j.isSeguido())
+                for (Noticia n : j.getNoticias())
+                    painelNoticias.add(gerarNoticiaPanel(n, j));
+        }
+        painelNoticias.revalidate();
     }
 
+    private void preencherPainelNoticias(JPanel painelNoticias, String titulo)
+    {
+        painelNoticias.removeAll();
+        for (Jornal j : jornais) {
+            if (j.isSeguido())
+                for (Noticia n : j.getNoticias(titulo))
+                    painelNoticias.add(gerarNoticiaPanel(n, j));
+        }
+        painelNoticias.revalidate();
+    }
+
+    private NoticiaPanel gerarNoticiaPanel(Noticia noticia, Jornal jornal)
+    {
+        // Ao adicionar um jornal para ler mais tarde,
+        // precisamos atualizar o painelLerMaisTarde.
+        // Mas não basta adicionar o NoticiaPanel np no painel de ler mais tarde,
+        // pois o botão também deve trocar (de ter botão "Remover").
+        // Para tanto, criamos um outro NoticiaPanel com esse botão,
+        // e adicionamos ele no painelLerMaisTarde.
+
+        JButton btn = new JButton("Ler mais tarde");
+        JButton btnRemover = new JButton("Remover");
+
+        NoticiaPanel np = new NoticiaPanel(noticia, jornal, btn);
+        NoticiaPanel npLerMaisTarde = new NoticiaPanel(noticia, jornal, btnRemover);
+
+        btn.addActionListener(e -> {
+            lerMaisTarde(noticia);
+            painelLerMaisTarde.add(npLerMaisTarde);
+            painelLerMaisTarde.repaint();
+        });
+        btnRemover.addActionListener(e -> {
+            removerLerMaisTarde(noticia);
+            painelLerMaisTarde.remove(npLerMaisTarde);
+            painelLerMaisTarde.repaint();
+        });
+
+        return np;
+    }
 
     private JPanel gerarPainelLerMaisTarde()
     {
