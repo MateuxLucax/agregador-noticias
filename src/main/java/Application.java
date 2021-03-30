@@ -1,15 +1,13 @@
 import enums.Regiao;
+import gui.DatePicker;
 import gui.NoticiaPanel;
 import models.Estatisticas;
 import models.Jornal;
 import models.Noticia;
-import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
 import parsers.BBCParser;
 import parsers.FSPParser;
 import parsers.G1Parser;
-import utils.DateLabelFormatter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Properties;
 
 public class Application {
 
@@ -250,7 +247,7 @@ public class Application {
         painel.add(gerarPainelPesquisa(painelNoticias));
         painelNoticias.setLayout(new BoxLayout(painelNoticias, BoxLayout.Y_AXIS));
 
-        preencherPainelNoticias(painelNoticias);
+        preencherPainelNoticias(painelNoticias, true);
 
         painel.add(painelNoticias);
 
@@ -263,6 +260,28 @@ public class Application {
     {
 
         JTabbedPane tabs = new JTabbedPane();
+
+        //
+        //  Mostrar noticias
+        //
+
+        JPanel painelInicial = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        JButton btTodasNoticias = new JButton("Todas as notícias");
+        JButton btNoticiasRecentes = new JButton("Notícias recentes");
+        btTodasNoticias.addActionListener(e -> {
+            preencherPainelNoticias(painelNoticias, false);
+            painelNoticias.repaint();
+        });
+        btNoticiasRecentes.addActionListener(e -> {
+            preencherPainelNoticias(painelNoticias, true);
+            painelNoticias.repaint();
+        });
+
+        painelInicial.add(btTodasNoticias);
+        painelInicial.add(btNoticiasRecentes);
+
+        tabs.add("Painel Inicial", painelInicial);
 
         //
         // Pesquisa por título
@@ -293,16 +312,9 @@ public class Application {
         // que preenche com as notícias recentes usando
         // preencherPainelNoticias(painelNoticias)
 
-        Properties properties = new Properties();
-        properties.put("text.today", "Hoje");
-        properties.put("text.month", "Mês");
-        properties.put("text.year", "Ano");
-
         JPanel painelData = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        UtilDateModel model = new UtilDateModel();
-        JDatePanelImpl datePanel = new JDatePanelImpl(model, properties);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
         JButton btPesquisarData = new JButton("Pesquisar");
+        JDatePickerImpl datePicker = DatePicker.generate();
 
         btPesquisarData.addActionListener(e -> {
             Date selectedDate = (Date) datePicker.getModel().getValue();
@@ -319,23 +331,19 @@ public class Application {
         //
 
         JPanel painelDataIntervalo = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        UtilDateModel modelIntervaloInicial = new UtilDateModel();
-        JDatePanelImpl datePanelIntervaloInicial = new JDatePanelImpl(modelIntervaloInicial, properties);
-        UtilDateModel modelIntervaloFinal = new UtilDateModel();
-        JDatePanelImpl datePanelIntervaloFinal = new JDatePanelImpl(modelIntervaloFinal, properties);
-        JDatePickerImpl datePickerIntervaloInicial= new JDatePickerImpl(datePanelIntervaloInicial, new DateLabelFormatter());
-        JDatePickerImpl datePickerIntervaloFinal = new JDatePickerImpl(datePanelIntervaloFinal, new DateLabelFormatter());
+        JDatePickerImpl datePickerInicial = DatePicker.generate();
+        JDatePickerImpl datePickerFinal = DatePicker.generate();
         JButton btPesquisarIntervalo = new JButton("Pesquisar");
 
         btPesquisarIntervalo.addActionListener(e -> {
-            Date selectedDateInicial = (Date) datePickerIntervaloInicial.getModel().getValue();
-            Date selectedDateFinal = (Date) datePickerIntervaloFinal.getModel().getValue();
+            Date selectedDateInicial = (Date) datePickerInicial.getModel().getValue();
+            Date selectedDateFinal = (Date) datePickerFinal.getModel().getValue();
 
             preencherPainelNoticias(painelNoticias, selectedDateInicial, selectedDateFinal);
         });
 
-        painelDataIntervalo.add(datePickerIntervaloInicial);
-        painelDataIntervalo.add(datePickerIntervaloFinal);
+        painelDataIntervalo.add(datePickerInicial);
+        painelDataIntervalo.add(datePickerFinal);
         painelDataIntervalo.add(btPesquisarIntervalo);
 
         tabs.add("Por intervalo de datas", painelDataIntervalo);
@@ -343,11 +351,11 @@ public class Application {
         return tabs;
     }
 
-    private void preencherPainelNoticias(JPanel painelNoticias) {
+    private void preencherPainelNoticias(JPanel painelNoticias, boolean recentes) {
         painelNoticias.removeAll();
         for (Jornal jornal : jornais)
             if (jornal.isSeguido())
-                for (Noticia noticia: jornal.getNoticiasRecentes())
+                for (Noticia noticia: recentes ? jornal.getNoticiasRecentes() : jornal.getNoticias())
                     painelNoticias.add(gerarNoticiaPanelDoPainelNoticias(noticia, jornal));
         painelNoticias.revalidate();
     }

@@ -1,10 +1,10 @@
 package models;
 
 import parsers.Parser;
+import utils.DateUtil;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,18 +61,14 @@ public class Jornal {
 
     public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
 
-        return filtrarNoticias(noticia -> dateToLocalDate(dataPesquisa).equals(dateToLocalDate(noticia.getData())));
+        return filtrarNoticias(noticia -> DateUtil.dateToLocalDate(dataPesquisa).equals(DateUtil.dateToLocalDate(noticia.getData())));
     }
 
     public ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal) {
-        LocalDate dataInicialLocal = dateToLocalDate(dataInicial);
-        LocalDate dataFinalLocal = dateToLocalDate(dataFinal);
+        LocalDate dataInicialLocal = DateUtil.dateToLocalDate(dataInicial);
+        LocalDate dataFinalLocal = DateUtil.dateToLocalDate(dataFinal);
 
-        return filtrarNoticias(noticia -> (dateToLocalDate(noticia.getData()).isAfter(dataInicialLocal) && dateToLocalDate(noticia.getData()).isBefore(dataFinalLocal)));
-    }
-
-    private LocalDate dateToLocalDate(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return filtrarNoticias(noticia -> (DateUtil.dateToLocalDate(noticia.getData()).isAfter(dataInicialLocal) && DateUtil.dateToLocalDate(noticia.getData()).isBefore(dataFinalLocal)));
     }
 
     @Override
