@@ -3,10 +3,13 @@ package models;
 import parsers.Parser;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -15,15 +18,18 @@ public class Jornal {
     private final String             nome;
     private final String             url;
     private       Parser             parser;
-    private       boolean            seguido;
+    private boolean                  seguido = true;
     private final ArrayList<Noticia> noticias;
 
-    public Jornal(String nome, String url, Parser parser) {
+    public Jornal(String nome, String url) {
         this.nome     = nome;
         this.url      = url;
-        this.parser   = parser;
-        this.seguido  = true;
         this.noticias = new ArrayList<>();
+    }
+
+    public Jornal(String nome, String url, Parser parser) {
+        this(nome, url);
+        this.parser   = parser;
         noticias.addAll(parser.getNoticias());
     }
 
@@ -45,7 +51,7 @@ public class Jornal {
     }
 
     public ArrayList<Noticia> getNoticiasRecentes() {
-        Date yesterday = Date.from(Instant.now().minus(1, ChronoUnit.DAYS));
+        Date yesterday = Date.from(Instant.now().minus(1, ChronoUnit.DAYS).atZone(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).toInstant());
         return filtrarNoticias(noticia -> noticia.getData().after(yesterday));
     }
 
@@ -54,16 +60,20 @@ public class Jornal {
     }
 
     public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
-        Instant pesquisaInstant = dataPesquisa.toInstant().truncatedTo(ChronoUnit.DAYS);
-        return filtrarNoticias(noticia -> pesquisaInstant.equals(noticia.getData().toInstant().truncatedTo(ChronoUnit.DAYS)));
+
+        return filtrarNoticias(noticia -> dateToLocalDate(dataPesquisa).equals(dateToLocalDate(noticia.getData())));
     }
 
     public ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal) {
-        dataInicial.toInstant().truncatedTo(ChronoUnit.DAYS);
-        dataFinal.toInstant().truncatedTo(ChronoUnit.DAYS);
-        return filtrarNoticias(noticia -> (noticia.getData().after(dataInicial) && noticia.getData().before(dataFinal)));
+        LocalDate dataInicialLocal = dateToLocalDate(dataInicial);
+        LocalDate dataFinalLocal = dateToLocalDate(dataFinal);
+
+        return filtrarNoticias(noticia -> (dateToLocalDate(noticia.getData()).isAfter(dataInicialLocal) && dateToLocalDate(noticia.getData()).isBefore(dataFinalLocal)));
     }
 
+    private LocalDate dateToLocalDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
 
     @Override
     public boolean equals(Object o) {
