@@ -2,6 +2,8 @@ import enums.Regiao;
 import models.Estatisticas;
 import models.Jornal;
 import models.Noticia;
+import parsers.BBCParser;
+import parsers.FSPParser;
 import parsers.G1Parser;
 import gui.NoticiaPanel;
 
@@ -57,8 +59,8 @@ public class Application {
     {
         jornais = new ArrayList<>();
         jornais.add(new Jornal("G1", "https://g1.globo.com/", new G1Parser()));
-        // jornais.add(new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()));
-        // jornais.add(new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser()));
+        jornais.add(new Jornal("Folha de São Paulo", "https://www.folha.uol.com.br/",   new FSPParser()));
+        jornais.add(new Jornal("BBC", "https://www.bbc.com/portuguese/", new BBCParser()));
     }
 
     private void criarFrame()
@@ -280,6 +282,10 @@ public class Application {
         //
         // Pesquisa por uma data
         //
+
+        // TODO adicionar botão "Último dia" aqui,
+        // que preenche com as notícias recentes usando
+        // preencherPainelNoticias(painelNoticias)
 
         JPanel painelData = new JPanel();
         //...

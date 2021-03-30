@@ -33,10 +33,9 @@ public class FSPParser extends Parser {
 
                 noticias.add(getNoticiaFromContent(headlineContent, getNewsDate(headlineContent)));
             } catch (Exception e) {
-                String errorMessage = e.toString();
-                if (hasSubscriberOnlyContent(news)) errorMessage = "Conteúdo apenas para assinantes";
-
-                System.out.println("AVISO [FSP]: " + errorMessage);
+                // String errorMessage = e.toString();
+                // if (hasSubscriberOnlyContent(news)) errorMessage = "Conteúdo apenas para assinantes";
+                // System.out.println("AVISO [FSP]: " + errorMessage);
             }
         });
 
