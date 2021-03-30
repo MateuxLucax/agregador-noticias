@@ -301,7 +301,7 @@ public class Application {
         painelNoticias.removeAll();
         for (Jornal j : jornais) {
             if (j.isSeguido())
-                for (Noticia n : j.getNoticias())
+                for (Noticia n : j.getNoticiasRecentes())
                     painelNoticias.add(gerarNoticiaPanelDoPainelNoticias(n, j));
         }
         painelNoticias.revalidate();
