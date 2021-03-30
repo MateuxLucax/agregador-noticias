@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class BBCParser extends Parser {
-    protected static final String BASE_URL = "https://www.bbc.com/portuguese/topics/clmq8rgyyvjt/page/";
+    private static final String BASE_URL = "https://www.bbc.com/portuguese/topics/clmq8rgyyvjt/page/";
     private static int MAX_PAGES;
     private static SimpleDateFormat formatter;
 

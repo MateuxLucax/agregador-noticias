@@ -19,7 +19,7 @@ import java.util.TimeZone;
 
 public class G1Parser extends Parser {
 
-    protected static final String BASE_URL = "https://g1.globo.com/bemestar/coronavirus/";
+    private static final String BASE_URL = "https://g1.globo.com/bemestar/coronavirus/";
     private static int MAX_PAGES;
     private static SimpleDateFormat formatter;
     private static String postUrl;

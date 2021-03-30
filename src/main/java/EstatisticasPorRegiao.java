@@ -59,6 +59,7 @@ public class EstatisticasPorRegiao {
         return estatisticas.get(r);
     }
 
+    /*
     public void printTabela() {
         DecimalFormat df = new DecimalFormat();
         df.setGroupingSize(3);
@@ -76,5 +77,6 @@ public class EstatisticasPorRegiao {
                     df.format(e.getSegundaDose()));
         }
     }
+    */
 
 }

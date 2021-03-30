@@ -12,7 +12,7 @@ import java.util.*;
 
 public class FSPParser extends Parser {
 
-    protected static final String BASE_URL = "https://www1.folha.uol.com.br/cotidiano/coronavirus/";
+    private static final String BASE_URL = "https://www1.folha.uol.com.br/cotidiano/coronavirus/";
     private static SimpleDateFormat formatter;
 
 

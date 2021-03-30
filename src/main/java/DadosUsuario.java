@@ -18,8 +18,8 @@ public class DadosUsuario {
     private File   arquivoJornaisSeguidos;
     private File   arquivoNoticias;
 
-    private static final Gson gson = new Gson();
     private static DadosUsuario instance;
+
 
     public static DadosUsuario getInstance() {
         if (instance == null)
@@ -36,7 +36,6 @@ public class DadosUsuario {
             System.out.println("ERRO: Não foi possível obter o diretório do projeto.");
         }
     }
-
 
     public String getDiretorio() {
         return diretorio;
@@ -81,11 +80,13 @@ public class DadosUsuario {
         // https://github.com/google/gson/blob/master/UserGuide.md#TOC-Collections-Examples
         Type arrayListNoticias = new TypeToken<ArrayList<Noticia>>(){}.getType();
 
+        Gson gson = new Gson();
         return gson.fromJson(scn.next(), arrayListNoticias);
     }
 
     public void saveNoticias(ArrayList<Noticia> noticias) throws IOException {
         FileWriter fw = new FileWriter(arquivoNoticias);
+        Gson gson = new Gson();
         fw.write(gson.toJson(noticias));
         fw.close();
     }
