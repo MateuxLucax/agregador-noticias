@@ -96,9 +96,16 @@ public class Application {
         JPanel painel = new JPanel();
         painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
 
-        //
-        // Painel de cadastro de notícias de outros jornais que o usuário quiser salvar
-        //
+        painel.add(gerarPainelCadastroNoticia(painel));
+
+        for (Noticia n : noticiasSalvas)
+            painel.add( gerarNoticiaPanelDoPainelLerMaisTarde(painel, n) );
+
+        return painel;
+    }
+
+    private JPanel gerarPainelCadastroNoticia(JPanel painel)
+    {
         JPanel cadastro = new JPanel();
         cadastro.setLayout(new BoxLayout(cadastro, BoxLayout.Y_AXIS));
         JPanel linha;
@@ -140,15 +147,7 @@ public class Application {
         linha.add(btnCadastrar);
         cadastro.add(linha);
 
-        painel.add(cadastro);
-
-        //
-        // Mostrar notícias já salvas
-        //
-        for (Noticia n : noticiasSalvas)
-            painel.add( gerarNoticiaPanelDoPainelLerMaisTarde(painel, n) );
-
-        return painel;
+        return cadastro;
     }
 
     private NoticiaPanel gerarNoticiaPanelDoPainelLerMaisTarde(JPanel painel, Noticia noticia)
@@ -222,6 +221,7 @@ public class Application {
     {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(comp);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         tabs.add(titulo, scrollPane);
     }
 
