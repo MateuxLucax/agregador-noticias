@@ -142,6 +142,13 @@ public class Application {
             painel.revalidate();
         });
         linha.add(btnCadastrar);
+        JButton btnLimpar = new JButton("Limpar");
+        btnLimpar.addActionListener(e -> {
+            tfTitulo.setText("");
+            tfUrl.setText("");
+            tfResumo.setText("");
+        });
+        linha.add(btnLimpar);
         cadastro.add(linha);
 
         return cadastro;
