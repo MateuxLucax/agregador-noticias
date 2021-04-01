@@ -31,7 +31,7 @@ public class DadosUsuario {
         try {
             diretorio              = System.getProperty("user.dir");
             arquivoJornaisSeguidos = new File(diretorio + "/jornais-seguidos.txt");
-            arquivoNoticias        = new File(diretorio + "/ler-mais-tarde.txt");
+            arquivoNoticias        = new File(diretorio + "/ler-mais-tarde.json");
         } catch (NullPointerException e) {
             System.out.println("ERRO: Não foi possível obter o diretório do projeto.");
         }

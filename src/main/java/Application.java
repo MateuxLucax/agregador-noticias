@@ -42,6 +42,7 @@ public class Application {
         carregarDadosUsuario();
 
         criarFrame();
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.pack();
         frame.setVisible(true);
     }
@@ -233,14 +234,18 @@ public class Application {
     {
         JTabbedPane tabs = new JTabbedPane();
 
-        addTabComScrollPane(tabs, "Estatísticas", gerarTabelaEstatisticas());
-        painelLerMaisTarde = gerarPainelLerMaisTarde();
-        addTabComScrollPane(tabs, "Ler mais tarde", painelLerMaisTarde);
+        var tabEstatisticas = gerarTabelaEstatisticas();
         // painelLerMaisTarde deve ser gerado ANTES do painel das notícias porque
         // o painel das notícias atualiza o painelLerMaisTarde quando o usuário
         // clica em ler uma notícia mais tarde
-        addTabComScrollPane(tabs, "Notícias", gerarPainelNoticias());
-        addTabComScrollPane(tabs, "Jornais seguidos", gerarPainelJornaisSeguidos());
+        painelLerMaisTarde = gerarPainelLerMaisTarde();
+        var tabNoticias = gerarPainelNoticias();
+        var tabJornaisSeguidos = gerarPainelJornaisSeguidos();
+
+        addTabComScrollPane(tabs, "Estatísticas", tabEstatisticas);
+        addTabComScrollPane(tabs, "Notícias", tabNoticias);
+        addTabComScrollPane(tabs, "Ler mais tarde", painelLerMaisTarde);
+        addTabComScrollPane(tabs, "Jornais seguidos", tabJornaisSeguidos);
 
         return tabs;
     }

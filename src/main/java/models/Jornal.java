@@ -1,10 +1,12 @@
 package models;
 
+import org.w3c.dom.CDATASection;
 import parsers.Parser;
 import utils.DateUtil;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,19 +58,25 @@ public class Jornal {
     }
 
     public ArrayList<Noticia> getNoticias(String titulo) {
-        return filtrarNoticias(noticia -> noticia.getTitulo().contains(titulo)) ;
+        return filtrarNoticias(noticia -> noticia.getTitulo().toLowerCase().contains(titulo.toLowerCase()));
     }
 
     public ArrayList<Noticia> getNoticias(Date dataPesquisa) {
-
-        return filtrarNoticias(noticia -> DateUtil.dateToLocalDate(dataPesquisa).equals(DateUtil.dateToLocalDate(noticia.getData())));
+        return filtrarNoticias(noticia -> {
+            LocalDate pesquisa = DateUtil.dateToLocalDate(dataPesquisa);
+            LocalDate dataNoticia = DateUtil.dateToLocalDate(noticia.getData());
+            return dataNoticia.isEqual(pesquisa);
+        });
     }
 
     public ArrayList<Noticia> getNoticias(Date dataInicial, Date dataFinal) {
         LocalDate dataInicialLocal = DateUtil.dateToLocalDate(dataInicial);
         LocalDate dataFinalLocal = DateUtil.dateToLocalDate(dataFinal);
 
-        return filtrarNoticias(noticia -> (DateUtil.dateToLocalDate(noticia.getData()).isAfter(dataInicialLocal) && DateUtil.dateToLocalDate(noticia.getData()).isBefore(dataFinalLocal)));
+        return filtrarNoticias(noticia -> {
+            LocalDate dataNoticia = DateUtil.dateToLocalDate(noticia.getData());
+            return (dataNoticia.isAfter(dataInicialLocal) || dataNoticia.isEqual(dataInicialLocal)) && (dataNoticia.isBefore(dataFinalLocal) || dataNoticia.isEqual(dataFinalLocal));
+        });
     }
 
     @Override

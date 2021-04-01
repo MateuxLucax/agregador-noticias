@@ -76,6 +76,8 @@ public class Noticia {
     }
 
     public static boolean isValidURL(String url) {
+        if (url == null) return false;
+
         String regex = "((http|https)://)(www.)?"
                 + "[a-zA-Z0-9@:%._\\+~#?&//=]"
                 + "{2,256}\\.[a-z]"
@@ -83,8 +85,6 @@ public class Noticia {
                 + "._\\+~#?&//=]*)";
 
         Pattern pattern = Pattern.compile(regex);
-
-        if (url == null) return false;
 
         Matcher matcher = pattern.matcher(url);
 
