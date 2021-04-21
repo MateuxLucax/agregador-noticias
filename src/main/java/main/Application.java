@@ -1,7 +1,9 @@
-import enums.Regiao;
+package main;
+
 import gui.DatePicker;
+import gui.EstatisticasTable;
+import gui.JornaisSeguidosPanel;
 import gui.NoticiaPanel;
-import models.Estatisticas;
 import models.Jornal;
 import models.Noticia;
 import org.jdatepicker.impl.JDatePickerImpl;
@@ -15,15 +17,13 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class Application {
 
     private ArrayList<Jornal>     jornais;
-    private EstatisticasPorRegiao estatisticas;
-    private DadosUsuario          dadosUsuario;
+    private ArquivosUsuario arquivosUsuario;
     private ArrayList<Noticia>    noticiasSalvas;
 
     // painelLerMaisTarde deve estar disponível globalmente
@@ -36,8 +36,7 @@ public class Application {
 
     public Application()
     {
-        estatisticas = EstatisticasPorRegiao.getInstance();
-        dadosUsuario = DadosUsuario.getInstance();
+        arquivosUsuario = ArquivosUsuario.getInstance();
         criarJornais();
         carregarDadosUsuario();
 
@@ -167,56 +166,6 @@ public class Application {
         return np;
     }
 
-    private JTable gerarTabelaEstatisticas()
-    {
-        Regiao[] regioes = Regiao.values();
-        String[] colunas = {"Região", "Casos", "Óbitos", "Recuperados", "Vacinados", "Segunda dose"};
-        String[][] dados = new String[regioes.length][colunas.length];
-        DecimalFormat df = new DecimalFormat();
-        df.setGroupingSize(3);
-
-        for (int i = 0; i < regioes.length; i++)
-        {
-            int j = 0;
-            Estatisticas e = estatisticas.getEstatisticas(regioes[i]);
-            dados[i][j++] = regioes[i].name();
-            dados[i][j++] = df.format(e.getCasos());
-            dados[i][j++] = df.format(e.getObitos());
-            dados[i][j++] = df.format(e.getRecuperados());
-            dados[i][j++] = df.format(e.getVacinados());
-            dados[i][j  ] = df.format(e.getSegundaDose());
-        }
-
-        JTable tabela = new JTable(dados, colunas);
-        // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
-        tabela.setDefaultEditor(Object.class, null);
-        return tabela;
-    }
-
-    private JPanel gerarPainelJornaisSeguidos()
-    {
-        JPanel painel = new JPanel();
-        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
-
-        int n = jornais.size();
-        JCheckBox[] cbs = new JCheckBox[n];
-        for (int i = 0; i < n; i++)
-        {
-            Jornal j = jornais.get(i);
-            cbs[i] = new JCheckBox(j.getNome(), j.isSeguido());
-            painel.add(cbs[i]);
-        }
-
-        JButton btSalvar = new JButton("Salvar preferências");
-        btSalvar.addActionListener(e -> {
-            for (int i = 0; i < n; i++)
-                jornais.get(i).setSeguido(cbs[i].isSelected());
-        });
-        painel.add(btSalvar);
-
-        return painel;
-    }
-
     //
     // Criação de tabs >> painel de notícias e pesquisa
     //
@@ -234,13 +183,17 @@ public class Application {
     {
         JTabbedPane tabs = new JTabbedPane();
 
-        var tabEstatisticas = gerarTabelaEstatisticas();
+        EstatisticasTable.inicializar();
+        JTable tabEstatisticas = EstatisticasTable.get();
+
         // painelLerMaisTarde deve ser gerado ANTES do painel das notícias porque
         // o painel das notícias atualiza o painelLerMaisTarde quando o usuário
         // clica em ler uma notícia mais tarde
         painelLerMaisTarde = gerarPainelLerMaisTarde();
-        var tabNoticias = gerarPainelNoticias();
-        var tabJornaisSeguidos = gerarPainelJornaisSeguidos();
+        JPanel tabNoticias = gerarPainelNoticias();
+
+        JornaisSeguidosPanel.inicializar(jornais);
+        JPanel tabJornaisSeguidos = JornaisSeguidosPanel.get();
 
         addTabComScrollPane(tabs, "Estatísticas", tabEstatisticas);
         addTabComScrollPane(tabs, "Notícias", tabNoticias);
@@ -432,8 +385,8 @@ public class Application {
     private void carregarDadosUsuario()
     {
         try {
-            noticiasSalvas = dadosUsuario.loadNoticias();
-            dadosUsuario.loadJornaisSeguidos(jornais);
+            noticiasSalvas = arquivosUsuario.loadNoticias();
+            arquivosUsuario.loadJornaisSeguidos(jornais);
         } catch (IOException e) {
             erroArquivos();
         }
@@ -442,8 +395,8 @@ public class Application {
     private void salvarDadosUsuario()
     {
         try {
-            dadosUsuario.saveJornaisSeguidos(jornais);
-            dadosUsuario.saveNoticias(noticiasSalvas);
+            arquivosUsuario.saveJornaisSeguidos(jornais);
+            arquivosUsuario.saveNoticias(noticiasSalvas);
         } catch (IOException e) {
             erroArquivos();
         }
@@ -455,66 +408,12 @@ public class Application {
         // Se bem que fazendo isso pode dar problema com o System.exit(0) logo em seguida
         System.out.println("Algum(ns) arquivo(s) estão faltando.");
         System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");
-        System.out.println("e coloque-os em " + dadosUsuario.getDiretorio());
+        System.out.println("e coloque-os em " + arquivosUsuario.getDiretorio());
     }
 
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args)
+    {
         Application app = new Application();
-
-        /* try {
-
-            app.noticiasSalvas = dadosUsuario.loadNoticias();
-            if (app.noticiasSalvas.size() > 0) {
-                System.out.println("Notícias que você salvou para ler mais tarde: ");
-                for (Noticia n : noticiasSalvas)
-                    System.out.println(n);
-            }
-
-            dadosUsuario.loadJornaisSeguidos(jornais);
-            for (Jornal jornal : jornais) {
-                if (jornal.seguido()) {
-                    Instant now = Instant.now();
-                    Date yesterday = Date.from(now.minus(1, ChronoUnit.DAYS));
-                    Date today     = Date.from(now.truncatedTo(ChronoUnit.DAYS));
-
-                    System.out.println(jornal.toString());
-                }
-            }
-
-            estatisticas.printTabela();
-
-            dadosUsuario.saveJornaisSeguidos(jornais);
-            dadosUsuario.saveNoticias(noticiasSalvas);
-
-        } catch (IOException e) {  // FileNotFoundException extends IOException
-            System.out.println("Algum(ns) arquivo(s) estão faltando.");
-            System.out.println("Baixe-os em https://github.com/MateuxLucax/agregador-noticias");
-            System.out.println("e coloque-os em " + dadosUsuario.getDiretorio());
-        }
-       */
     }
 }
-
-/* private JTable gerarTabelaNoticias(Jornal jornal)
-{
-    String[] colunas = {"Título", "Data de publicação", "Resumo", "URL"};
-    String[][] dados = new String[jornal.getNoticias().size()][colunas.length];
-
-    DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm", new Locale("pt", "br"));
-
-    for (int i = 0; i < jornal.getNoticias().size(); i++)
-    {
-        int j = 0;
-        dados[i][j++] = jornal.getNoticias().get(i).getTitulo();
-        dados[i][j++] = dateFormat.format(jornal.getNoticias().get(i).getData());
-        dados[i][j++] = jornal.getNoticias().get(i).getResumo();
-        dados[i][j++] = jornal.getNoticias().get(i).getUrl();
-    }
-
-    JTable tabela = new JTable(dados, colunas);
-    // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
-    tabela.setDefaultEditor(Object.class, null);
-    return tabela;
-}*/

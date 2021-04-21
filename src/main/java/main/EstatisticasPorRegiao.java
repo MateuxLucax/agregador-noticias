@@ -1,8 +1,9 @@
+package main;
+
 import enums.Regiao;
 import models.Estatisticas;
 import org.jsoup.Jsoup;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 
 public class EstatisticasPorRegiao {

@@ -1,3 +1,5 @@
+package main;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import models.Jornal;
@@ -12,22 +14,22 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Scanner;
 
-public class DadosUsuario {
+public class ArquivosUsuario {
 
     private String diretorio;
     private File   arquivoJornaisSeguidos;
     private File   arquivoNoticias;
 
-    private static DadosUsuario instance;
+    private static ArquivosUsuario instance;
 
 
-    public static DadosUsuario getInstance() {
+    public static ArquivosUsuario getInstance() {
         if (instance == null)
-            instance = new DadosUsuario();
+            instance = new ArquivosUsuario();
         return instance;
     }
 
-    private DadosUsuario() {
+    private ArquivosUsuario() {
         try {
             diretorio              = System.getProperty("user.dir");
             arquivoJornaisSeguidos = new File(diretorio + "/jornais-seguidos.txt");
