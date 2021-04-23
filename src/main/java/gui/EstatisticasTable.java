@@ -7,19 +7,42 @@ import models.Estatisticas;
 import javax.swing.*;
 import java.text.DecimalFormat;
 
+
 public class EstatisticasTable
 {
     private final JTable tabela;
     private static EstatisticasTable instance;
 
-    public static void inicializar() {
+    public static void inicializar()
+    {
         instance = new EstatisticasTable();
     }
 
-    public static JTable get() {
+    public static JTable get()
+    {
         return instance.tabela;
     }
 
+    /* Por que não fazer EstatisticasTable uma subclasse de JTable,
+       de forma que se em vez de escrever
+           EstatisticasTable.inicializar();
+           JTable tabEstatisticas = EstatisticasTable.get();
+       se escreve
+           JTable tabEstatisticas = new EstatisticasTable();
+       ?
+
+       Porque atualmente, para instanciar a JTable, fazemos o seguinte:
+           this.tabela = new JTable(dados, colunas);
+       Se EstatisticasTable fosse subclasse de JTable, teríamos que fazer
+           super(dados, colunas);
+       Mas precisamos gerar os dados e as colunas antes,
+       e uma chamada super() precisa ser a primeira do construtor.
+
+       Então por que não ler os dados e as colunas como argumentos do construtor:
+           JTable tabEstatisticas = new EstatisticasTable(dados, colunas);
+       ?
+       Porque abstrair a tabela é justamente o propósito da classe EstatisticasTable.
+     */
 
     private EstatisticasTable()
     {
@@ -45,8 +68,8 @@ public class EstatisticasTable
             dados[i][j  ] = df.format(e.getSegundaDose());
         }
 
-        tabela = new JTable(dados, colunas);
+        this.tabela = new JTable(dados, colunas);
         // Para usuário não poder editar a coluna (https://stackoverflow.com/a/36356371)
-        tabela.setDefaultEditor(Object.class, null);
+        this.tabela.setDefaultEditor(Object.class, null);
     }
 }
